@@ -1,0 +1,1706 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>英単語帳「LEAP」暗記サイト</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header / Navbar -->
+    <header class="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('home')">
+                    <span class="bg-indigo-600 text-white font-bold px-3 py-1.5 rounded-lg shadow-sm text-lg">LEAP</span>
+                    <h1 class="text-xl font-bold tracking-tight text-slate-900">英単語帳暗記サイト</h1>
+                </div>
+                <button id="homeGuideButton" onclick="openUsageModal()" class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 px-3 py-1.5 rounded-lg font-semibold transition">このサイトの使い方</button>
+            </div>
+            <div class="flex items-center space-x-4 flex-wrap">
+                <!-- User Profile & Rank -->
+                <div class="flex items-center space-x-2 bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200">
+                    <span id="userRankBadge" class="text-xs font-bold px-2 py-0.5 rounded text-white bg-slate-500">見習い</span>
+                    <input type="text" id="usernameInput" value="学習者" class="bg-transparent font-semibold text-sm focus:outline-none w-24 text-slate-700" onchange="updateUsername(this.value)" title="クリックしてユーザー名変更">
+                    <span class="text-xs text-slate-500">合計スコア: <strong id="totalScoreDisplay">0</strong></span>
+                </div>
+                <!-- Account Login/Logout Controls (Home Screen Only) -->
+                <div id="homeAuthControls" class="flex items-center space-x-1.5">
+                    <span id="authStatusBadge" class="hidden text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1.5 rounded-lg font-medium max-w-[240px] truncate"></span>
+                    <button id="openAuthModalBtn" onclick="openAuthModal()" class="text-xs bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded-lg font-medium shadow-sm transition">ログイン / 登録</button>
+                    <button id="logoutBtn" onclick="handleLogout()" class="hidden text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 px-2.5 py-1.5 rounded-lg font-medium transition">ログアウト</button>
+                </div>
+                <!-- Data Save/Load/Export/Import (Home Screen Only) -->
+                <div id="homeDataControls" class="flex items-center space-x-1">
+                    <button onclick="exportData()" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-2.5 py-1.5 rounded font-medium transition">エクスポート</button>
+                    <label class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-2.5 py-1.5 rounded font-medium transition cursor-pointer">
+                        インポート<input type="file" id="importFile" class="hidden" accept=".json" onchange="importData(event)">
+                    </label>
+                    <button onclick="loadData(true)" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-2.5 py-1.5 rounded font-medium transition">ロード</button>
+                    <button onclick="saveData()" class="text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded font-medium shadow-sm transition">セーブ</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-6">
+
+        <!-- 1. Home View -->
+        <div id="view-home" class="space-y-6">
+            <div class="bg-gradient-to-r from-indigo-500 to-violet-600 rounded-2xl p-6 text-white shadow-md">
+                <h2 class="text-2xl font-bold mb-2">LEAP英単語暗記プラットフォーム</h2>
+                <p class="text-indigo-100 text-sm">300個の厳選された英単語を効率的に暗記・確認しましょう。</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- 英語→日本語モード -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center font-bold text-xl mb-4">英→日</div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-1">英語→日本語モード</h3>
+                        <p class="text-slate-600 text-sm mb-4">英単語を一つ一つ表示し、時間経過で自動で日本語が表示されます。〇△×で記憶度を判定します。</p>
+                    </div>
+                    <button onclick="openBlockSelector('ej')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 px-4 rounded-xl transition shadow-sm">
+                        モードを開始する
+                    </button>
+                </div>
+
+                <!-- 日本語→英語モード -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 bg-violet-50 text-violet-600 rounded-xl flex items-center justify-center font-bold text-xl mb-4">日→英</div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-1">日本語→英語モード</h3>
+                        <p class="text-slate-600 text-sm mb-4">100個の日本語訳を表にし、英語を隠した状態でノートに書き、サイトで答え合わせを行います（〇×判定）。</p>
+                    </div>
+                    <button onclick="openBlockSelector('je')" class="w-full bg-violet-600 hover:bg-violet-700 text-white font-medium py-2.5 px-4 rounded-xl transition shadow-sm">
+                        モードを開始する
+                    </button>
+                </div>
+
+                <!-- 苦手単語 -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center font-bold text-xl mb-4">苦手</div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-1">苦手単語</h3>
+                        <p class="text-slate-600 text-sm mb-4">両モードでスコアの低い下位20単語、合計40単語を4択問題形式で集中的に復習します。</p>
+                    </div>
+                    <button onclick="startWeakWordsQuiz()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-medium py-2.5 px-4 rounded-xl transition shadow-sm">
+                        苦手単語を特訓する
+                    </button>
+                </div>
+
+                <!-- 英単語リスト -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center font-bold text-xl mb-4">一覧</div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-1">英単語リスト</h3>
+                        <p class="text-slate-600 text-sm mb-4">300個の単語リストを100個ごとに確認し、各単語のスコア状況を一覧でチェックできます。</p>
+                    </div>
+                    <button onclick="switchView('list')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 px-4 rounded-xl transition shadow-sm">
+                        リストを表示する
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Block Selector Modal / View -->
+        <div id="view-block-select" class="hidden max-w-xl mx-auto bg-white p-8 rounded-2xl shadow-sm border border-slate-200 space-y-6">
+            <h2 id="blockSelectTitle" class="text-xl font-bold text-slate-900">ブロックを選択してください</h2>
+            <div class="space-y-3">
+                <button onclick="selectBlock(1)" class="w-full text-left p-4 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/50 transition flex justify-between items-center">
+                    <div>
+                        <div class="font-bold text-slate-900">ブロック 1 (1 〜 100)</div>
+                        <div class="text-xs text-slate-500">基礎・重要単語</div>
+                    </div>
+                    <span class="text-indigo-600 font-bold">選択 →</span>
+                </button>
+                <button onclick="selectBlock(2)" class="w-full text-left p-4 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/50 transition flex justify-between items-center">
+                    <div>
+                        <div class="font-bold text-slate-900">ブロック 2 (101 〜 200)</div>
+                        <div class="text-xs text-slate-500">標準・発展単語</div>
+                    </div>
+                    <span class="text-indigo-600 font-bold">選択 →</span>
+                </button>
+                <button onclick="selectBlock(3)" class="w-full text-left p-4 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/50 transition flex justify-between items-center">
+                    <div>
+                        <div class="font-bold text-slate-900">ブロック 3 (201 〜 300)</div>
+                        <div class="text-xs text-slate-500">応用・難関単語</div>
+                    </div>
+                    <span class="text-indigo-600 font-bold">選択 →</span>
+                </button>
+            </div>
+            <button onclick="switchView('home')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2.5 rounded-xl transition">
+                ホームに戻る
+            </button>
+        </div>
+
+        <!-- 3. Timer & Settings for English -> Japanese Mode -->
+        <div id="view-ej-settings" class="hidden max-w-xl mx-auto bg-white p-8 rounded-2xl shadow-sm border border-slate-200 space-y-6">
+            <h2 class="text-xl font-bold text-slate-900">英語 → 日本語モード設定</h2>
+            <div class="space-y-2">
+                <p class="text-sm text-slate-600">出題対象を選択してください。</p>
+                <div class="grid grid-cols-2 gap-3">
+                    <button id="ejFilterAllBtn" onclick="setEJTargetFilter('all')" class="p-3 rounded-xl border-2 border-indigo-600 bg-indigo-50 text-center font-bold text-indigo-700 text-sm transition">
+                        100単語すべてに挑戦
+                    </button>
+                    <button id="ejFilterWeakBtn" onclick="setEJTargetFilter('nonPositive')" class="p-3 rounded-xl border-2 border-slate-200 hover:border-indigo-400 text-center font-bold text-slate-600 text-sm transition">
+                        スコアが0またはマイナスの単語のみ
+                    </button>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <p class="text-sm text-slate-600">日本語が表示されるまでの経過時間を選択してください。</p>
+                <div class="grid grid-cols-3 gap-4">
+                    <button onclick="startEJQuiz(3)" class="p-4 rounded-xl border-2 border-indigo-200 hover:border-indigo-600 hover:bg-indigo-50 text-center font-bold text-indigo-600 transition">
+                        3 秒
+                    </button>
+                    <button onclick="startEJQuiz(5)" class="p-4 rounded-xl border-2 border-indigo-200 hover:border-indigo-600 hover:bg-indigo-50 text-center font-bold text-indigo-600 transition">
+                        5 秒
+                    </button>
+                    <button onclick="startEJQuiz(10)" class="p-4 rounded-xl border-2 border-indigo-200 hover:border-indigo-600 hover:bg-indigo-50 text-center font-bold text-indigo-600 transition">
+                        10 秒
+                    </button>
+                </div>
+            </div>
+            <button onclick="openBlockSelector('ej')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2.5 rounded-xl transition">
+                ブロック選択に戻る
+            </button>
+        </div>
+
+        <!-- 4. English -> Japanese Mode Quiz View -->
+        <div id="view-ej-quiz" class="hidden max-w-xl mx-auto bg-white p-8 rounded-2xl shadow-sm border border-slate-200 space-y-6">
+            <div class="flex justify-between items-center text-sm text-slate-500 border-b pb-3">
+                <span id="ejProgress">問題 1 / 100</span>
+                <div class="flex items-center space-x-3">
+                    <span id="ejTimerDisplay" class="font-bold text-indigo-600">残り 5.0 秒</span>
+                    <button onclick="interruptEJMode()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg font-medium transition border border-slate-200">中断してスコアを保存</button>
+                </div>
+            </div>
+
+            <div class="text-center py-10 space-y-4">
+                <div id="ejWordEng" class="text-4xl font-extrabold text-slate-900 tracking-wide">achievement</div>
+                <div id="ejWordJapContainer" class="transition-all duration-300 opacity-0 transform translate-y-2">
+                    <div id="ejWordJap" class="text-2xl font-bold text-indigo-600 bg-indigo-50 py-3 px-6 rounded-xl inline-block">達成する</div>
+                </div>
+            </div>
+
+            <div id="ejControls" class="hidden grid grid-cols-3 gap-4 pt-4 border-t">
+                <button onclick="answerEJ('circle')" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold py-3 rounded-xl transition text-lg flex items-center justify-center space-x-1">
+                    <span>〇</span> <span class="text-xs font-normal">(+1)</span>
+                </button>
+                <button onclick="answerEJ('triangle')" class="bg-amber-50 hover:bg-amber-100 text-emerald-700 border border-amber-200 font-bold py-3 rounded-xl transition text-lg flex items-center justify-center space-x-1">
+                    <span>△</span> <span class="text-xs font-normal">(±0)</span>
+                </button>
+                <button onclick="answerEJ('cross')" class="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold py-3 rounded-xl transition text-lg flex items-center justify-center space-x-1">
+                    <span>×</span> <span class="text-xs font-normal">(-1)</span>
+                </button>
+            </div>
+            <div id="ejWaitingMsg" class="text-center text-sm text-slate-400 py-2">
+                日本語が表示されるのを待っています...
+            </div>
+        </div>
+
+        <!-- 5. Japanese -> English Mode View -->
+        <div id="view-je-mode" class="hidden max-w-4xl mx-auto bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
+            <div class="flex flex-wrap justify-between items-center gap-4 border-b pb-4">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-900">日本語 → 英語モード</h2>
+                    <p class="text-xs text-slate-500">ノートに英語を書き、ボタンで確認しながら〇×でスコアをつけましょう。</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button onclick="revealAllJE()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-medium transition">一括で英語を表示</button>
+                    <button onclick="interruptJEMode()" class="bg-amber-100 hover:bg-amber-200 text-amber-800 px-3 py-1.5 rounded-lg text-xs font-medium transition">中断してスコアを保存</button>
+                    <button onclick="finishJEMode()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-lg text-xs font-medium transition shadow-sm">終了してスコアを保存</button>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-200 text-slate-400 text-xs uppercase">
+                            <th class="py-3 px-4 font-semibold">No.</th>
+                            <th class="py-3 px-4 font-semibold">日本語訳</th>
+                            <th class="py-3 px-4 font-semibold">英単語</th>
+                            <th class="py-3 px-4 font-semibold text-center">判定 (〇 / ×)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="jeTableBody" class="divide-y divide-slate-100 text-sm">
+                        <!-- Dynamic rows -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 6. Weak Words Mode View -->
+        <div id="view-weak-quiz" class="hidden max-w-xl mx-auto bg-white p-8 rounded-2xl shadow-sm border border-slate-200 space-y-6">
+            <div class="flex justify-between items-center text-sm text-slate-500 border-b pb-3">
+                <span id="weakProgress">問題 1 / 40</span>
+                <div class="flex items-center space-x-3">
+                    <span class="font-bold text-amber-600">苦手単語特訓</span>
+                    <button onclick="interruptWeakQuiz()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg font-medium transition border border-slate-200">中断してスコアを保存</button>
+                </div>
+            </div>
+
+            <div class="text-center py-6 space-y-2">
+                <div class="text-xs uppercase tracking-wider text-slate-400 font-semibold" id="weakQuestionPrompt">次の単語の意味を選んでください</div>
+                <div>
+                    <span id="weakCurrentScore" class="inline-block text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">現在のスコア: 0</span>
+                </div>
+                <div id="weakTargetWord" class="text-3xl font-extrabold text-slate-900">achieve</div>
+                <div id="weakFeedback" class="hidden mt-3 py-2 px-4 rounded-xl text-sm font-bold"></div>
+            </div>
+
+            <div id="weakOptionsContainer" class="space-y-3">
+                <!-- 4 Options -->
+            </div>
+        </div>
+
+        <!-- 7. Vocabulary List View -->
+        <div id="view-list" class="hidden max-w-5xl mx-auto bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
+            <div class="flex flex-wrap justify-between items-center gap-4 border-b pb-4">
+                <h2 class="text-xl font-bold text-slate-900">英単語表リスト</h2>
+                <div class="flex flex-wrap items-center gap-3">
+                    <div class="flex items-center space-x-1 bg-slate-100 p-1 rounded-lg">
+                        <button onclick="switchListSort('original')" id="sortBtnOriginal" class="px-3 py-1.5 rounded-md text-xs font-bold bg-white text-indigo-600 shadow-sm transition">もとの順番</button>
+                        <button onclick="switchListSort('high')" id="sortBtnHigh" class="px-3 py-1.5 rounded-md text-xs font-bold text-slate-600 hover:text-slate-900 transition">スコアの高い順</button>
+                        <button onclick="switchListSort('low')" id="sortBtnLow" class="px-3 py-1.5 rounded-md text-xs font-bold text-slate-600 hover:text-slate-900 transition">スコアの低い順</button>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button onclick="switchListBlock(1)" id="listBtn1" class="px-4 py-2 rounded-lg text-sm font-medium bg-indigo-600 text-white transition">1-100</button>
+                        <button onclick="switchListBlock(2)" id="listBtn2" class="px-4 py-2 rounded-lg text-sm font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 transition">101-200</button>
+                        <button onclick="switchListBlock(3)" id="listBtn3" class="px-4 py-2 rounded-lg text-sm font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 transition">201-300</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-200 text-slate-400 text-xs uppercase">
+                            <th class="py-3 px-4 font-semibold">No.</th>
+                            <th class="py-3 px-4 font-semibold">英単語</th>
+                            <th class="py-3 px-4 font-semibold">日本語訳</th>
+                            <th class="py-3 px-4 font-semibold text-center">英→日 スコア</th>
+                            <th class="py-3 px-4 font-semibold text-center">日→英 スコア</th>
+                            <th class="py-3 px-4 font-semibold text-center">総合スコア</th>
+                            <th class="py-3 px-4 font-semibold text-center">英→日 試行回数</th>
+                            <th class="py-3 px-4 font-semibold text-center">日→英 試行回数</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vocabTableBody" class="divide-y divide-slate-100 text-sm">
+                        <!-- Dynamic rows -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="text-center pt-4">
+                <button onclick="switchView('home')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2.5 px-6 rounded-xl transition">
+                    ホームに戻る
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Message Box / Modal (No alert/confirm used) -->
+    <div id="messageModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white max-w-md w-full p-6 rounded-2xl shadow-xl space-y-4 text-center">
+            <h3 id="modalTitle" class="text-lg font-bold text-slate-900">通知</h3>
+            <p id="modalMessage" class="text-slate-600 text-sm">メッセージ内容</p>
+            <button onclick="closeModal()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-xl transition shadow-sm">
+                閉じる
+            </button>
+        </div>
+    </div>
+
+    <!-- Custom Confirm Modal for Interrupt -->
+    <div id="confirmModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white max-w-md w-full p-6 rounded-2xl shadow-xl space-y-4 text-center">
+            <h3 class="text-lg font-bold text-slate-900">学習の中断確認</h3>
+            <p id="confirmMessage" class="text-slate-600 text-sm">ここまでのスコアを保存して中断しますか？</p>
+            <div class="grid grid-cols-2 gap-3 pt-2">
+                <button onclick="closeConfirmModal(false)" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2.5 rounded-xl transition">
+                    続ける
+                </button>
+                <button onclick="closeConfirmModal(true)" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-xl transition shadow-sm">
+                    中断して保存
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Usage Guide Modal -->
+    <div id="usageModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white max-w-2xl w-full p-6 rounded-2xl shadow-xl space-y-4 max-h-[85vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+                <h3 class="text-lg font-bold text-slate-900">このサイトの使い方</h3>
+                <button onclick="closeUsageModal()" class="text-slate-400 hover:text-slate-600 font-bold text-lg px-2">×</button>
+            </div>
+            <div class="space-y-3 text-sm text-slate-700 text-left leading-relaxed">
+                <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                    <h4 class="font-bold text-indigo-700 mb-1">1. 英語→日本語モード</h4>
+                    <p>100単語ずつのブロックと出題対象（100単語すべて／スコアが0またはマイナスの単語のみ）、日本語表示までの時間（3秒・5秒・10秒）を選んで開始します。表示された日本語を見て記憶度を「〇 (+1)」「△ (±0)」「× (-1)」で判定します。</p>
+                </div>
+                <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                    <h4 class="font-bold text-violet-700 mb-1">2. 日本語→英語モード</h4>
+                    <p>100個の日本語訳が一覧表示されます。手元のノートに英単語を書いた後、「英語を表示」または「一括で英語を表示」で答え合わせを行い、「〇 (+1)」「× (-1)」でスコアをつけます。</p>
+                </div>
+                <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                    <h4 class="font-bold text-amber-700 mb-1">3. 苦手単語</h4>
+                    <p>英語→日本語・日本語→英語のそれぞれでスコアが低い下位20単語（合計40単語）が4択問題で出題されます。正解で+1、不正解で-1され、3秒後に自動で次の問題へ進みます。</p>
+                </div>
+                <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                    <h4 class="font-bold text-emerald-700 mb-1">4. 英単語リスト・スコア・試行回数</h4>
+                    <p>300単語を100語ごとに一覧表示し、「もとの順番」「スコアの高い順」「スコアの低い順」で並べ替えできます。各モードのスコアに加え、初めてスコアがプラスになるまでに回答した「試行回数」も確認できます。</p>
+                </div>
+                <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                    <h4 class="font-bold text-slate-800 mb-1">5. ランク・セーブとロード</h4>
+                    <p>全単語の合計スコアに応じてユーザーランクが変化します。学習データはホーム画面上部の「セーブ」「ロード」「エクスポート」「インポート」から保存・復元でき、各モードの学習中でも「中断してスコアを保存」が可能です。</p>
+                </div>
+            </div>
+            <button onclick="closeUsageModal()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-xl transition shadow-sm">
+                閉じる
+            </button>
+        </div>
+    </div>
+
+    <!-- Authentication Modal (Google & Email/Password) -->
+    <div id="authModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white max-w-md w-full p-6 rounded-2xl shadow-xl space-y-5">
+            <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+                <h3 class="text-lg font-bold text-slate-900">アカウントログイン・新規登録</h3>
+                <button onclick="closeAuthModal()" class="text-slate-400 hover:text-slate-600 font-bold text-lg px-2">×</button>
+            </div>
+            <p class="text-xs text-slate-500">ログインすると、スコア・試行回数・ユーザー名がクラウドに自動同期され、別の端末からも引き継げます。</p>
+
+            <!-- Google Sign-In -->
+            <button id="btn-google-signin" onclick="handleGoogleSignIn()" class="w-full flex items-center justify-center space-x-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 font-semibold py-2.5 px-4 rounded-xl transition shadow-sm text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                <svg class="w-4 h-4" viewBox="0 0 24 24">
+                    <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.4 1 3.5 3.6 1.6 7.4l3.7 2.8C6.2 7.2 8.9 5 12 5z"/>
+                    <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.6l3.7 2.9c2.2-2 3.7-5 3.7-8.7z"/>
+                    <path fill="#FBBC05" d="M5.3 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.6 7.4C.6 9.4 0 11.6 0 14s.6 4.6 1.6 6.6l3.7-2.8z"/>
+                    <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3.1 0-5.8-2.1-6.7-5l-3.7 2.8C3.5 20.4 7.4 23 12 23z"/>
+                </svg>
+                <span>Googleアカウントでログイン</span>
+            </button>
+
+            <div class="relative flex py-1 items-center">
+                <div class="flex-grow border-t border-slate-200"></div>
+                <span class="flex-shrink mx-3 text-xs text-slate-400">またはメールアドレスでログイン / 登録</span>
+                <div class="flex-grow border-t border-slate-200"></div>
+            </div>
+
+            <!-- Email / Password Form -->
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">メールアドレス</label>
+                    <input type="email" id="authEmailInput" placeholder="example@email.com" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">パスワード（6文字以上）</label>
+                    <input type="password" id="authPasswordInput" placeholder="••••••••" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:border-indigo-500">
+                </div>
+                <div id="auth-error-msg" class="hidden text-xs text-rose-600 bg-rose-50 border border-rose-200 px-3 py-2 rounded-lg"></div>
+                <div class="grid grid-cols-2 gap-3 pt-1">
+                    <button id="btn-email-login" onclick="handleEmailLogin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-xl transition text-sm shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                        ログイン
+                    </button>
+                    <button id="btn-email-register" onclick="handleEmailSignUp()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-2.5 rounded-xl transition text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                        新規登録
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Authentication & Firestore Cloud Sync Module -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import {
+            getAuth,
+            signInAnonymously,
+            signInWithCustomToken,
+            onAuthStateChanged,
+            GoogleAuthProvider,
+            signInWithPopup,
+            signInWithRedirect,
+            getRedirectResult,
+            createUserWithEmailAndPassword,
+            signInWithEmailAndPassword,
+            signOut
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import {
+            getFirestore,
+            doc,
+            getDoc,
+            setDoc,
+            onSnapshot
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        let firebaseConfig = null;
+        try {
+            if (typeof __firebase_config !== 'undefined' && __firebase_config) {
+                firebaseConfig = typeof __firebase_config === 'string'
+                    ? JSON.parse(__firebase_config)
+                    : __firebase_config;
+            }
+        } catch (e) {
+            window.__fbInitError = "Firebase設定の読み込みに失敗しました: " + (e.message || "");
+            console.error("Failed to parse __firebase_config:", e);
+        }
+
+        let auth = null;
+        let db = null;
+        let currentUser = null;
+        let unsubscribeCloudSync = null;
+
+        function updateAuthUI(user) {
+            const statusBadge = document.getElementById('authStatusBadge');
+            const openBtn = document.getElementById('openAuthModalBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (!statusBadge || !openBtn || !logoutBtn) return;
+
+            if (user && !user.isAnonymous) {
+                const accountIdentifier = user.displayName && user.email
+                    ? `${user.displayName} (${user.email})`
+                    : (user.email || user.displayName || 'アカウント');
+                const providerLabel = user.providerData && user.providerData[0]?.providerId === 'google.com'
+                    ? 'Google'
+                    : 'メール';
+                statusBadge.textContent = `ログイン中 [${providerLabel}]: ${accountIdentifier}`;
+                statusBadge.title = `ログイン中のアカウント (${providerLabel}): ${accountIdentifier}`;
+                statusBadge.classList.remove('hidden');
+                openBtn.classList.add('hidden');
+                logoutBtn.classList.remove('hidden');
+            } else {
+                statusBadge.classList.add('hidden');
+                statusBadge.textContent = '';
+                openBtn.classList.remove('hidden');
+                logoutBtn.classList.add('hidden');
+            }
+        }
+
+        window.syncToCloud = async function() {
+            if (!db || !auth || !auth.currentUser || auth.currentUser.isAnonymous) return;
+            try {
+                const userDocRef = doc(db, 'artifacts', appId, 'users', auth.currentUser.uid, 'leapProgress', 'main');
+                await setDoc(userDocRef, {
+                    username: appData.username,
+                    words: appData.words,
+                    updatedAt: Date.now()
+                }, { merge: true });
+            } catch (e) {
+                console.error("Cloud sync write error:", e);
+            }
+        };
+
+        async function attachUserCloudListener(user) {
+            if (!db || !user || user.isAnonymous) return;
+            if (unsubscribeCloudSync) {
+                unsubscribeCloudSync();
+                unsubscribeCloudSync = null;
+            }
+            const userDocRef = doc(db, 'artifacts', appId, 'users', user.uid, 'leapProgress', 'main');
+            try {
+                const snap = await getDoc(userDocRef);
+                if (!snap.exists()) {
+                    await setDoc(userDocRef, {
+                        username: appData.username,
+                        words: appData.words,
+                        updatedAt: Date.now()
+                    });
+                }
+            } catch (e) {
+                console.error("Initial cloud check failed:", e);
+            }
+
+            unsubscribeCloudSync = onSnapshot(userDocRef, (snapshot) => {
+                if (!snapshot.exists()) return;
+                const data = snapshot.data();
+                if (data.username) {
+                    appData.username = data.username;
+                    const input = document.getElementById('usernameInput');
+                    if (input) input.value = data.username;
+                }
+                if (data.words) {
+                    for (let id in data.words) {
+                        if (appData.words[id]) {
+                            const sEJ = data.words[id].scoreEJ || 0;
+                            const sJE = data.words[id].scoreJE || 0;
+                            appData.words[id].scoreEJ = sEJ;
+                            appData.words[id].scoreJE = sJE;
+                            appData.words[id].ejAttempts = data.words[id].ejAttempts || 0;
+                            appData.words[id].jeAttempts = data.words[id].jeAttempts || 0;
+                            appData.words[id].ejReachedPositive = typeof data.words[id].ejReachedPositive === 'boolean'
+                                ? data.words[id].ejReachedPositive
+                                : (sEJ > 0);
+                            appData.words[id].jeReachedPositive = typeof data.words[id].jeReachedPositive === 'boolean'
+                                ? data.words[id].jeReachedPositive
+                                : (sJE > 0);
+                        }
+                    }
+                }
+                localStorage.setItem('leap_app_data', JSON.stringify({
+                    username: appData.username,
+                    words: appData.words
+                }));
+                if (typeof updateHeader === 'function') updateHeader();
+            }, (err) => {
+                console.error("Cloud sync listener error:", err);
+            });
+        }
+
+        async function initFirebase() {
+            if (!firebaseConfig) {
+                if (!window.__fbInitError) {
+                    window.__fbInitError = "クラウド認証の設定（Firebase設定）がこの環境に存在しないため、アカウントログインを利用できません。";
+                }
+                window.dispatchEvent(new Event('firebase-ready'));
+                return;
+            }
+            try {
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                window.fbAuth = auth;
+                window.fbAuthFns = {
+                    GoogleAuthProvider,
+                    signInWithPopup,
+                    signInWithRedirect,
+                    getRedirectResult,
+                    createUserWithEmailAndPassword,
+                    signInWithEmailAndPassword,
+                    signOut,
+                    signInAnonymously,
+                    cleanupCloudListener: () => {
+                        if (unsubscribeCloudSync) {
+                            unsubscribeCloudSync();
+                            unsubscribeCloudSync = null;
+                        }
+                    }
+                };
+                window.__fbInitError = null;
+                window.dispatchEvent(new Event('firebase-ready'));
+
+                try {
+                    const redirectResult = await getRedirectResult(auth);
+                    if (redirectResult && redirectResult.user && typeof window.showModal === 'function') {
+                        window.showModal("ログイン完了", "Googleアカウントでログインしました。学習データが自動同期されます。");
+                    }
+                } catch (redirectErr) {
+                    if (typeof window.openAuthModal === 'function') {
+                        window.openAuthModal();
+                    }
+                    if (typeof window.setAuthStatusMessage === 'function' && typeof window.formatFirebaseAuthError === 'function') {
+                        window.setAuthStatusMessage(window.formatFirebaseAuthError(redirectErr), 'error');
+                    }
+                }
+
+                if (!auth.currentUser) {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                }
+
+                onAuthStateChanged(auth, async (user) => {
+                    currentUser = user;
+                    updateAuthUI(user);
+                    if (user && !user.isAnonymous) {
+                        await attachUserCloudListener(user);
+                    }
+                });
+            } catch (err) {
+                window.__fbInitError = "Firebase認証の初期化に失敗しました: " + (err?.message || "");
+                console.error("Firebase initialization failed:", err);
+                window.dispatchEvent(new Event('firebase-ready'));
+            }
+        }
+
+        initFirebase();
+    </script>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Standard-script Authentication Handlers (Immediate response regardless of async module timing)
+        function setAuthStatusMessage(msg, type = 'error') {
+            const box = document.getElementById('auth-error-msg');
+            if (!box) return;
+            if (!msg) {
+                box.classList.add('hidden');
+                box.textContent = '';
+                return;
+            }
+            box.textContent = msg;
+            if (type === 'info') {
+                box.className = 'text-xs text-indigo-700 bg-indigo-50 border border-indigo-200 px-3 py-2 rounded-lg';
+            } else {
+                box.className = 'text-xs text-rose-600 bg-rose-50 border border-rose-200 px-3 py-2 rounded-lg';
+            }
+            box.classList.remove('hidden');
+        }
+
+        function setAuthButtonsDisabled(disabled) {
+            ['btn-google-signin', 'btn-email-login', 'btn-email-register'].forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) btn.disabled = disabled;
+            });
+        }
+
+        function formatFirebaseAuthError(err) {
+            const code = err?.code || '';
+            const isInIframe = (() => {
+                try {
+                    return window.self !== window.top;
+                } catch (e) {
+                    return true;
+                }
+            })();
+
+            if (code === 'auth/unauthorized-domain') {
+                return '現在のドメインがFirebaseの「承認済みドメイン」に登録されていません。Firebaseコンソールでドメインを追加するか、メールアドレス・パスワードログイン、またはホーム画面の「セーブ／エクスポート」をご利用ください。';
+            }
+            if (code === 'auth/operation-not-allowed') {
+                return 'FirebaseコンソールでGoogle認証（またはメール認証）が有効化されていません。設定を確認してください。';
+            }
+            if (code === 'auth/popup-blocked' || code === 'auth/operation-not-supported-in-this-environment') {
+                return isInIframe
+                    ? 'プレビューの埋め込み環境（sandboxed iframe）のためGoogle認証がブロックされました。画面右上のボタンから「新しいタブで開く」か、下のメールアドレス・パスワードログイン、またはホーム画面の「セーブ／エクスポート」をご利用ください。'
+                    : 'ブラウザによってポップアップまたはリダイレクトがブロックされました。ブラウザのポップアップ許可を確認するか、メールアドレスログインをご利用ください。';
+            }
+            if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') {
+                return isInIframe
+                    ? '認証ウィンドウが閉じられたか、埋め込み画面の制限で中断されました。「新しいタブで開く」から試すか、メールアドレス・パスワードログインをご利用ください。'
+                    : 'ログインウィンドウが閉じられたため中断されました。もう一度お試しください。';
+            }
+            if (code === 'auth/invalid-email') {
+                return 'メールアドレスの形式が正しくありません。';
+            }
+            if (code === 'auth/user-disabled') {
+                return 'このアカウントは無効化されています。';
+            }
+            if (code === 'auth/user-not-found' || code === 'auth/wrong-password' || code === 'auth/invalid-credential') {
+                return 'メールアドレスまたはパスワードが正しくありません。';
+            }
+            if (code === 'auth/email-already-in-use') {
+                return 'このメールアドレスは既に登録されています。「ログイン」ボタンをお試しください。';
+            }
+            if (code === 'auth/weak-password') {
+                return 'パスワードが弱すぎます。6文字以上で入力してください。';
+            }
+            if (code === 'auth/too-many-requests') {
+                return '試行回数が上限に達しました。しばらく時間をおいてから再度お試しください。';
+            }
+            if (code === 'auth/network-request-failed') {
+                return 'ネットワークエラーが発生しました。インターネット接続を確認してください。';
+            }
+            return (err?.message || '認証エラーが発生しました。') + (isInIframe ? '（プレビュー画面では外部認証が制限される場合があります。新しいタブで開くか、ローカルの「セーブ／エクスポート」をご利用ください）' : '');
+        }
+
+        function openAuthModal() {
+            setAuthStatusMessage('');
+            setAuthButtonsDisabled(false);
+            const modal = document.getElementById('authModal');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeAuthModal() {
+            setAuthStatusMessage('');
+            setAuthButtonsDisabled(false);
+            const modal = document.getElementById('authModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function ensureAuthReady() {
+            if (window.__fbInitError) {
+                setAuthStatusMessage(
+                    window.__fbInitError + ' プレビュー環境で制限されている場合は「新しいタブで開く」をお試しいただくか、ホーム画面の「セーブ」「エクスポート」機能をご利用ください。',
+                    'error'
+                );
+                return false;
+            }
+            if (!window.fbAuth || !window.fbAuthFns) {
+                setAuthStatusMessage(
+                    '認証システムがまだ準備できていないか、プレビュー環境の制限により読み込めませんでした。数秒待ってから再度押すか、ホーム画面の「セーブ」「エクスポート」機能をご利用ください。',
+                    'error'
+                );
+                return false;
+            }
+            return true;
+        }
+
+        async function handleGoogleSignIn() {
+            setAuthStatusMessage('Google認証を起動しています...', 'info');
+            setAuthButtonsDisabled(true);
+
+            if (!ensureAuthReady()) {
+                setAuthButtonsDisabled(false);
+                return;
+            }
+
+            const auth = window.fbAuth;
+            const { GoogleAuthProvider, signInWithPopup, signInWithRedirect } = window.fbAuthFns;
+            const provider = new GoogleAuthProvider();
+            provider.setCustomParameters({ prompt: 'select_account' });
+
+            try {
+                await signInWithPopup(auth, provider);
+                setAuthButtonsDisabled(false);
+                closeAuthModal();
+                showModal("ログイン完了", "Googleアカウントでログインしました。学習データが自動同期されます。");
+            } catch (err) {
+                const code = err?.code || '';
+                const shouldFallbackRedirect =
+                    code === 'auth/popup-blocked' ||
+                    code === 'auth/operation-not-supported-in-this-environment';
+
+                if (shouldFallbackRedirect && typeof signInWithRedirect === 'function') {
+                    setAuthStatusMessage('ポップアップが制限されたため、リダイレクト認証へ切り替えています...', 'info');
+                    try {
+                        await signInWithRedirect(auth, provider);
+                        return;
+                    } catch (redirectErr) {
+                        setAuthStatusMessage(formatFirebaseAuthError(redirectErr), 'error');
+                        setAuthButtonsDisabled(false);
+                        return;
+                    }
+                }
+                setAuthStatusMessage(formatFirebaseAuthError(err), 'error');
+                setAuthButtonsDisabled(false);
+            }
+        }
+
+        async function handleEmailSignUp() {
+            setAuthStatusMessage('新規登録処理を実行しています...', 'info');
+            setAuthButtonsDisabled(true);
+
+            if (!ensureAuthReady()) {
+                setAuthButtonsDisabled(false);
+                return;
+            }
+
+            const email = (document.getElementById('authEmailInput')?.value || '').trim();
+            const password = document.getElementById('authPasswordInput')?.value || '';
+            if (!email || password.length < 6) {
+                setAuthStatusMessage('メールアドレスと6文字以上のパスワードを入力してください。', 'error');
+                setAuthButtonsDisabled(false);
+                return;
+            }
+
+            try {
+                await window.fbAuthFns.createUserWithEmailAndPassword(window.fbAuth, email, password);
+                setAuthButtonsDisabled(false);
+                closeAuthModal();
+                showModal("新規登録完了", "アカウントを作成しログインしました。現在の学習データがクラウドに保存されました。");
+            } catch (err) {
+                setAuthStatusMessage(formatFirebaseAuthError(err), 'error');
+                setAuthButtonsDisabled(false);
+            }
+        }
+
+        async function handleEmailLogin() {
+            setAuthStatusMessage('ログイン処理を実行しています...', 'info');
+            setAuthButtonsDisabled(true);
+
+            if (!ensureAuthReady()) {
+                setAuthButtonsDisabled(false);
+                return;
+            }
+
+            const email = (document.getElementById('authEmailInput')?.value || '').trim();
+            const password = document.getElementById('authPasswordInput')?.value || '';
+            if (!email || !password) {
+                setAuthStatusMessage('メールアドレスとパスワードを入力してください。', 'error');
+                setAuthButtonsDisabled(false);
+                return;
+            }
+
+            try {
+                await window.fbAuthFns.signInWithEmailAndPassword(window.fbAuth, email, password);
+                setAuthButtonsDisabled(false);
+                closeAuthModal();
+                showModal("ログイン完了", "ログインしました。クラウド上の学習データを同期しました。");
+            } catch (err) {
+                setAuthStatusMessage(formatFirebaseAuthError(err), 'error');
+                setAuthButtonsDisabled(false);
+            }
+        }
+
+        async function handleLogout() {
+            if (!window.fbAuth || !window.fbAuthFns) return;
+            try {
+                if (typeof window.fbAuthFns.cleanupCloudListener === 'function') {
+                    window.fbAuthFns.cleanupCloudListener();
+                }
+                await window.fbAuthFns.signOut(window.fbAuth);
+                await window.fbAuthFns.signInAnonymously(window.fbAuth);
+                showModal("ログアウト完了", "ログアウトしました。引き続きゲスト（ブラウザ保存）として利用できます。");
+            } catch (err) {
+                showModal("エラー", "ログアウトに失敗しました: " + (err?.message || ''));
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const btnGoogle = document.getElementById('btn-google-signin');
+            const btnLogin = document.getElementById('btn-email-login');
+            const btnRegister = document.getElementById('btn-email-register');
+
+            if (btnGoogle) {
+                btnGoogle.onclick = function(e) {
+                    e.preventDefault();
+                    handleGoogleSignIn();
+                };
+            }
+            if (btnLogin) {
+                btnLogin.onclick = function(e) {
+                    e.preventDefault();
+                    handleEmailLogin();
+                };
+            }
+            if (btnRegister) {
+                btnRegister.onclick = function(e) {
+                    e.preventDefault();
+                    handleEmailSignUp();
+                };
+            }
+        });
+
+        window.addEventListener('firebase-ready', () => {
+            if (window.__fbInitError) {
+                const box = document.getElementById('auth-error-msg');
+                if (box && !box.classList.contains('hidden')) {
+                    setAuthStatusMessage(
+                        window.__fbInitError + ' プレビュー環境で制限されている場合は「新しいタブで開く」をお試しいただくか、ホーム画面の「セーブ」「エクスポート」機能をご利用ください。',
+                        'error'
+                    );
+                }
+            }
+        });
+
+        // 300 LEAP-compliant Vocabulary Dataset
+        const LEAP_WORDS_DATA = [
+            // Block 1 (1-100)
+            {id:1, eng:"achieve", jap:"達成する"}, {id:2, eng:"tend", jap:"傾向がある"}, {id:3, eng:"establish", jap:"確立する"}, {id:4, eng:"include", jap:"含む"}, {id:5, eng:"improve", jap:"改善する"},
+            {id:6, eng:"create", jap:"創造する"}, {id:7, eng:"consider", jap:"考慮する"}, {id:8, eng:"appear", jap:"現れる"}, {id:9, eng:"exist", jap:"存在する"}, {id:10, eng:"maintain", jap:"維持する"},
+            {id:11, eng:"depend", jap: "依存する"}, {id:12, eng:"differ", jap: "異なる"}, {id:13, eng:"require", jap: "必要とする"}, {id:14, eng:"support", jap: "支持する"}, {id:15, eng:"provide", jap: "提供する"},
+            {id:16, eng:"encourage", jap: "励ます"}, {id:17, eng:"develop", jap: "発達させる"}, {id:18, eng:"cause", jap: "引き起こす"}, {id:19, eng:"reduce", jap: "減らす"}, {id:20, eng:"adapt", jap: "適応する"},
+            {id:21, eng:"affect", jap: "影響する"}, {id:22, eng:"concern", jap: "心配させる"}, {id:23, eng:"involve", jap: "巻き込む"}, {id:24, eng:"produce", jap: "生産する"}, {id:25, eng:"tendency", jap: "傾向"},
+            {id:26, eng:"influence", jap: "影響"}, {id:27, eng:"consequence", jap: "結果"}, {id:28, eng:"aspect", jap: "側面"}, {id:29, eng:"factor", jap: "要素"}, {id:30, eng:"role", jap: "役割"},
+            {id:31, eng:"generation", jap: "世代"}, {id:32, eng:"region", jap: "地域"}, {id:33, eng:"resource", jap: "資源"}, {id:34, eng:"source", jap: "源"}, {id:35, eng:"habit", jap: "習慣"},
+            {id:36, eng:"custom", jap: "慣習"}, {id:37, eng:"society", jap: "社会"}, {id:38, eng:"community", jap: "共同体"}, {id:39, eng:"population", jap: "人口"}, {id:40, eng:"individual", jap: "個人"},
+            {id:41, eng:"public", jap: "公衆の"}, {id:42, eng:"private", jap: "個人の"}, {id:43, eng:"global", jap: "地球規模の"}, {id:44, eng:"local", jap: "地元の"}, {id:45, eng:"native", jap: "母国の"},
+            {id:46, eng:"foreign", jap: "外国の"}, {id:47, eng:"domestic", jap: "国内の"}, {id:48, eng:"traditional", jap: "伝統的な"}, {id:49, eng:"modern", jap: "現代の"}, {id:50, eng:"ancient", jap: "古代の"},
+            {id:51, eng:"current", jap: "現在の"}, {id:52, eng:"recent", jap: "最近の"}, {id:53, eng:"future", jap: "将来の"}, {id:54, eng:"past", jap: "過去の"}, {id:55, eng:"century", jap: "世紀"},
+            {id:56, eng:"decade", jap: "10年"}, {id:57, eng:"era", jap: "時代"}, {id:58, eng:"period", jap: "期間"}, {id:59, eng:"moment", jap: "瞬間"}, {id:60, eng:"annual", jap: "年1回の"},
+            {id:61, eng:"frequent", jap: "頻繁な"}, {id:62, eng:"constant", jap: "絶え間ない"}, {id:63, eng:"gradual", jap: "徐々の"}, {id:64, eng:"sudden", jap: "突然の"}, {id:65, eng:"rapid", jap: "急速な"},
+            {id:66, eng:"slow", jap: "遅い"}, {id:67, eng:"quick", jap: "速い"}, {id:68, eng:"prompt", jap: "敏速な"}, {id:69, eng:"temporary", jap: "一時的な"}, {id:70, eng:"permanent", jap: "永続的な"},
+            {id:71, eng:"primary", jap: "第一の"}, {id:72, eng:"secondary", jap: "第二の"}, {id:73, eng:"major", jap: "主要な"}, {id:74, eng:"minor", jap: "重要でない"}, {id:75, eng:"prime", jap: "最も重要な"},
+            {id:76, eng:"chief", jap: "最高責任者"}, {id:77, eng:"principle", jap: "原則"}, {id:78, eng:"standard", jap: "基準"}, {id:79, eng:"criterion", jap: "尺度"}, {id:80, eng:"rule", jap: "規則"},
+            {id:81, eng:"regulation", jap: "規制"}, {id:82, eng:"law", jap: "法律"}, {id:83, eng:"justice", jap: "正義"}, {id:84, eng:"crime", jap: "犯罪"}, {id:85, eng:"guilt", jap: "有罪"},
+            {id:86, eng:"innocence", jap: "無罪"}, {id:87, eng:"prison", jap: "刑務所"}, {id:88, eng:"punishment", jap: "罰"}, {id:89, eng:"penalty", jap: "刑罰"}, {id:90, eng:"judge", jap: "裁判官"},
+            {id:91, eng:"jury", jap: "陪審"}, {id:92, eng:"witness", jap: "証人"}, {id:93, eng:"evidence", jap: "証拠"}, {id:94, eng:"proof", jap: "証拠"}, {id:95, eng:"clue", jap: "手がかり"},
+            {id:96, eng:"theory", jap: "理論"}, {id:97, eng:"hypothesis", jap: "仮説"}, {id:98, eng:"concept", jap: "概念"}, {id:99, eng:"notion", jap: "観念"}, {id:100, eng:"idea", jap: "考え"},
+
+            // Block 2 (101-200)
+            {id:101, eng:"ability", jap: "能力"}, {id:102, eng:"capacity", jap: "収容能力"}, {id:103, eng:"capability", jap: "潜在能力"}, {id:104, eng:"talent", jap: "才能"}, {id:105, eng:"skill", jap: "技能"},
+            {id:106, eng:"technique", jap: "技術"}, {id:107, eng:"technology", jap: "科学技術"}, {id:108, eng:"method", jap: "方法"}, {id:109, eng:"approach", jap: "アプローチ"}, {id:110, eng:"strategy", jap: "戦略"},
+            {id:111, eng:"tactic", jap: "戦術"}, {id:112, eng:"plan", jap: "計画"}, {id:113, eng:"project", jap: "計画"}, {id:114, eng:"scheme", jap: "計画"}, {id:115, eng:"program", jap: "計画"},
+            {id:116, eng:"schedule", jap: "予定表"}, {id:117, eng:"agenda", jap: "協議事項"}, {id:118, eng:"goal", jap: "目標"}, {id:119, eng:"target", jap: "的"}, {id:120, eng:"aim", jap: "狙い"},
+            {id:121, eng:"purpose", jap: "目的"}, {id:122, eng:"object", jap: "物体"}, {id:123, eng:"intent", jap: "意図"}, {id:124, eng:"outcome", jap: "結果"}, {id:125, eng:"result", jap: "結果"},
+            {id:126, eng:"effect", jap: "効果"}, {id:127, eng:"impact", jap: "衝撃"}, {id:128, eng:"affect", jap: "影響する"}, {id:129, eng:"influence", jap: "影響する"}, {id:130, eng:"cause", jap: "引き起こす"},
+            {id:131, eng:"reason", jap: "理由"}, {id:132, eng:"cause", jap: "原因"}, {id:133, eng:"origin", jap: "起源"}, {id:134, eng:"root", jap: "根"}, {id:135, eng:"basis", jap: "基礎"},
+            {id:136, eng:"foundation", jap: "土台"}, {id:137, eng:"ground", jap: "地面"}, {id:138, eng:"land", jap: "土地"}, {id:139, eng:"earth", jap: "地球"}, {id:140, eng:"soil", jap: "土壌"},
+            {id:141, eng:"dust", jap: "ほこり"}, {id:142, eng:"mud", jap: "泥"}, {id:143, eng:"rock", jap: "岩"}, {id:144, eng:"stone", jap: "石"}, {id:145, eng:"mountain", jap: "山"},
+            {id:146, eng:"hill", jap: "丘"}, {id:147, eng:"valley", jap: "谷"}, {id:148, eng:"river", jap: "川"}, {id:149, eng:"stream", jap: "小川"}, {id:150, eng:"lake", jap: "湖"},
+            {id:151, eng:"ocean", jap: "海洋"}, {id:152, eng:"sea", jap: "海"}, {id:153, eng:"wave", jap: "波"}, {id:154, eng:"shore", jap: "岸"}, {id:155, eng:"coast", jap: "海岸"},
+            {id:156, eng:"beach", jap: "浜辺"}, {id:157, eng:"island", jap: "島"}, {id:158, eng:"forest", jap: "森林"}, {id:159, eng:"woods", jap: "森"}, {id:160, eng:"jungle", jap: "ジャングル"},
+            {id:161, eng:"desert", jap: "砂漠"}, {id:162, eng:"field", jap: "原野"}, {id:163, eng:"plain", jap: "平原"}, {id:164, eng:"grass", jap: "草"}, {id:165, eng:"plant", jap: "植物"},
+            {id:166, eng:"flower", jap: "花"}, {id:167, eng:"tree", jap: "木"}, {id:168, eng:"branch", jap: "枝"}, {id:169, eng:"leaf", jap: "葉"}, {id:170, eng:"root", jap: "根"},
+            {id:171, eng:"fruit", jap: "果実"}, {id:172, eng:"seed", jap: "種"}, {id:173, eng:"crop", jap: "作物"}, {id:174, eng:"harvest", jap: "収穫"}, {id:175, eng:"animal", jap: "動物"},
+            {id:176, eng:"creature", jap: "生き物"}, {id:177, eng:"beast", jap: "野獣"}, {id:178, eng:"wildlife", jap: "野生生物"}, {id:179, eng:"insect", jap: "昆虫"}, {id:180, eng:"bird", jap: "鳥"},
+            {id:181, eng:"fish", jap: "魚"}, {id:182, eng:"species", jap: "種"}, {id:183, eng:"breed", jap: "品種"}, {id:184, eng:"pet", jap: "ペット"}, {id:185, eng:"owner", jap: "飼い主"},
+            {id:186, eng:"master", jap: "主人"}, {id:187, eng:"servant", jap: "召使い"}, {id:188, eng:"slave", jap: "奴隷"}, {id:189, eng:"host", jap: "主人"}, {id:190, eng:"guest", jap: "客"},
+            {id:191, eng:"visitor", jap: "訪問者"}, {id:192, eng:"stranger", jap: "見知らぬ人"}, {id:193, eng:"neighbor", jap: "近所の人"}, {id:194, eng:"member", jap: "一員"}, {id:195, eng:"partner", jap: "仲間"},
+            {id:196, eng:"colleague", jap: "同僚"}, {id:197, eng:"companion", jap: "連れ"}, {id:198, eng:"associate", jap: "仲間"}, {id:199, eng:"ally", jap: "同盟国"}, {id:200, eng:"enemy", jap: "敵"},
+
+            // Block 3 (201-300)
+            {id:201, eng:"danger", jap: "危険"}, {id:202, eng:"risk", jap: "リスク"}, {id:203, eng:"hazard", jap: "危険要素"}, {id:204, eng:"threat", jap: "脅威"}, {id:205, eng:"crisis", jap: "危機"},
+            {id:206, eng:"emergency", jap: "緊急事態"}, {id:207, eng:"disaster", jap: "災害"}, {id:208, eng:"tragedy", jap: "悲劇"}, {id:209, eng:"accident", jap: "事故"}, {id:210, eng:"incident", jap: "出来事"},
+            {id:211, eng:"event", jap: "行事"}, {id:212, eng:"occasion", jap: "機会"}, {id:213, eng:"opportunity", jap: "好機"}, {id:214, eng:"chance", jap: "可能性"}, {id:215, eng:"luck", jap: "運"},
+            {id:216, eng:"fortune", jap: "幸運"}, {id:217, eng:"fate", jap: "運命"}, {id:218, eng:"destiny", jap: "運命"}, {id:219, eng:"doom", jap: "破滅"}, {id:220, eng:"success", jap: "成功"},
+            {id:221, eng:"failure", jap: "失敗"}, {id:222, eng:"victory", jap: "勝利"}, {id:223, eng:"defeat", jap: "敗北"}, {id:224, eng:"triumph", jap: "大勝利"}, {id:225, eng:"prize", jap: "賞"},
+            {id:226, eng:"award", jap: "賞"}, {id:227, eng:"reward", jap: "報酬"}, {id:228, eng:"bonus", jap: "ボーナス"}, {id:229, eng:"benefit", jap: "利益"}, {id:230, eng:"profit", jap: "利益"},
+            {id:231, eng:"loss", jap: "損失"}, {id:232, eng:"damage", jap: "損害"}, {id:233, eng:"harm", jap: "害"}, {id:234, eng:"injury", jap: "負傷"}, {id:235, eng:"wound", jap: "傷"},
+            {id:236, eng:"pain", jap: "痛み"}, {id:237, eng:"ache", jap: "うずき"}, {id:238, eng:"suffer", jap: "苦しむ"}, {id:239, eng:"cure", jap: "治療する"}, {id:240, eng:"heal", jap: "直す"},
+            {id:241, eng:"treatment", jap: "治療"}, {id:242, eng:"medicine", jap: "薬"}, {id:243, eng:"drug", jap: "麻薬"}, {id:244, eng:"pill", jap: "錠剤"}, {id:245, eng:"remedy", jap: "治療薬"},
+            {id:246, eng:"health", jap: "健康"}, {id:247, eng:"fitness", jap: "健康"}, {id:248, eng:"strength", jap: "体力"}, {id:249, eng:"energy", jap: "エネルギー"}, {id:250, eng:"vigor", jap: "活力"},
+            {id:251, eng:"power", jap: "力"}, {id:252, eng:"force", jap: "暴力"}, {id:253, eng:"might", jap: "力"}, {id:254, eng:"strength", jap: "強さ"}, {id:255, eng:"weakness", jap: "弱さ"},
+            {id:256, eng:"fragility", jap: "脆さ"}, {id:257, eng:"stiff", jap: "硬い"}, {id:258, eng:"flexible", jap: "柔軟な"}, {id:259, eng:"rigid", jap: "厳格な"}, {id:260, eng:"hard", jap: "硬い"},
+            {id:261, eng:"soft", jap: "柔らかい"}, {id:262, eng:"smooth", jap: "なめらかな"}, {id:263, eng:"rough", jap: "粗い"}, {id:264, eng:"sharp", jap: "鋭い"}, {id:265, eng:"blunt", jap: "鈍い"},
+            {id:266, eng:"clear", jap: "明確な"}, {id:267, eng:"obscure", jap: "不明瞭な"}, {id:268, eng:"vague", jap: "曖昧な"}, {id:269, eng:"definite", jap: "明確な"}, {id:270, eng:"certain", jap: "確実な"},
+            {id:271, eng:"sure", jap: "確信して"}, {id:272, eng:"doubt", jap: "疑い"}, {id:273, eng:"suspicion", jap: "嫌疑"}, {id:274, eng:"trust", jap: "信頼"}, {id:275, eng:"faith", jap: "信仰"},
+            {id:276, eng:"belief", jap: "信念"}, {id:277, eng:"opinion", jap: "意見"}, {id:278, eng:"view", jap: "見解"}, {id:279, eng:"idea", jap: "考え"}, {id:280, eng:"thought", jap: "思考"},
+            {id:281, eng:"mind", jap: "精神"}, {id:282, eng:"brain", jap: "脳"}, {id:283, eng:"intellect", jap: "知性"}, {id:284, eng:"intelligence", jap: "知能"}, {id:285, eng:"wisdom", jap: "知恵"},
+            {id:286, eng:"knowledge", jap: "知識"}, {id:287, eng:"sense", jap: "感覚"}, {id:288, eng:"feeling", jap: "感情"}, {id:289, eng:"emotion", jap: "感情"}, {id:290, eng:"passion", jap: "情熱"},
+            {id:291, eng:"desire", jap: "欲望"}, {id:292, eng:"wish", jap: "願い"}, {id:293, eng:"hope", jap: "希望"}, {id:294, eng:"dream", jap: "夢"}, {id:295, eng:"ambition", jap: "大志"},
+            {id:296, eng:"goal", jap: "目標"}, {id:297, eng:"aim", jap: "狙い"}, {id:298, eng:"target", jap: "的"}, {id:299, eng:"plan", jap: "計画"}, {id:300, eng:"project", jap: "計画"}
+        ];
+
+        // Application State
+        let appData = {
+            username: "学習者",
+            words: {} // wordId -> { scoreEJ: 0, scoreJE: 0, ejAttempts: 0, jeAttempts: 0, ejReachedPositive: false, jeReachedPositive: false }
+        };
+
+        // Initialize state for words
+        LEAP_WORDS_DATA.forEach(w => {
+            appData.words[w.id] = {
+                scoreEJ: 0,
+                scoreJE: 0,
+                ejAttempts: 0,
+                jeAttempts: 0,
+                ejReachedPositive: false,
+                jeReachedPositive: false
+            };
+        });
+
+        // Current Session State
+        let currentMode = 'home';
+        let currentBlock = 1;
+        let ejTargetFilter = 'all'; // 'all' | 'nonPositive'
+        let ejTimerSeconds = 5;
+        let ejQueue = [];
+        let ejCurrentIndex = 0;
+        let ejTimerInterval = null;
+        let weakQuizList = [];
+        let weakQuizIndex = 0;
+        let weakFeedbackTimeout = null;
+        let currentListBlock = 1;
+        let currentListSort = 'original'; // 'original' | 'high' | 'low'
+
+        // Helper to record attempt count until first positive score (> 0)
+        function recordAttemptAndScore(wordId, mode, delta) {
+            const entry = appData.words[wordId];
+            if (!entry) return;
+            if (mode === 'ej') {
+                if (!entry.ejReachedPositive && entry.scoreEJ <= 0) {
+                    entry.ejAttempts = (entry.ejAttempts || 0) + 1;
+                }
+                entry.scoreEJ += delta;
+                if (entry.scoreEJ > 0) {
+                    entry.ejReachedPositive = true;
+                }
+            } else if (mode === 'je') {
+                if (!entry.jeReachedPositive && entry.scoreJE <= 0) {
+                    entry.jeAttempts = (entry.jeAttempts || 0) + 1;
+                }
+                entry.scoreJE += delta;
+                if (entry.scoreJE > 0) {
+                    entry.jeReachedPositive = true;
+                }
+            }
+        }
+
+        // Load data from LocalStorage on start
+        window.addEventListener('DOMContentLoaded', () => {
+            loadData(false);
+            updateHeader();
+            switchView('home');
+        });
+
+        function saveData(silent = false) {
+            const dataToSave = {
+                username: appData.username,
+                words: appData.words
+            };
+            localStorage.setItem('leap_app_data', JSON.stringify(dataToSave));
+            if (typeof window.syncToCloud === 'function') {
+                window.syncToCloud();
+            }
+            if (!silent) {
+                showModal("セーブ完了", "スコアや解答履歴を保存しました。");
+            }
+        }
+
+        function loadData(showNotify = false) {
+            const saved = localStorage.getItem('leap_app_data');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    if (parsed.username) appData.username = parsed.username;
+                    if (parsed.words) {
+                        for (let id in parsed.words) {
+                            if (appData.words[id]) {
+                                const sEJ = parsed.words[id].scoreEJ || 0;
+                                const sJE = parsed.words[id].scoreJE || 0;
+                                appData.words[id].scoreEJ = sEJ;
+                                appData.words[id].scoreJE = sJE;
+                                appData.words[id].ejAttempts = parsed.words[id].ejAttempts || 0;
+                                appData.words[id].jeAttempts = parsed.words[id].jeAttempts || 0;
+                                appData.words[id].ejReachedPositive = typeof parsed.words[id].ejReachedPositive === 'boolean'
+                                    ? parsed.words[id].ejReachedPositive
+                                    : (sEJ > 0);
+                                appData.words[id].jeReachedPositive = typeof parsed.words[id].jeReachedPositive === 'boolean'
+                                    ? parsed.words[id].jeReachedPositive
+                                    : (sJE > 0);
+                            }
+                        }
+                    }
+                    if (showNotify) {
+                        showModal("ロード完了", "保存されたスコアや解答履歴を読み込みました。");
+                    }
+                } catch (e) {
+                    console.error("Failed to load saved data", e);
+                }
+            } else if (showNotify) {
+                showModal("通知", "保存されたデータが見つかりませんでした。");
+            }
+            document.getElementById('usernameInput').value = appData.username;
+            updateHeader();
+        }
+
+        function updateUsername(name) {
+            appData.username = name || "学習者";
+            saveData();
+        }
+
+        function getTotalScore() {
+            let total = 0;
+            for (let id in appData.words) {
+                total += (appData.words[id].scoreEJ + appData.words[id].scoreJE);
+            }
+            return total;
+        }
+
+        function updateHeader() {
+            const total = getTotalScore();
+            document.getElementById('totalScoreDisplay').innerText = total;
+
+            // Rank & Color determination
+            let rankName = "見習い";
+            let rankClass = "bg-slate-500 text-white";
+            let nameColor = "text-slate-700";
+
+            if (total >= 500) {
+                rankName = "マスター";
+                rankClass = "bg-gradient-to-r from-red-500 via-purple-500 to-indigo-500 text-white font-extrabold";
+            } else if (total >= 300) {
+                rankName = "プラチナ";
+                rankClass = "bg-purple-600 text-white font-bold";
+            } else if (total >= 150) {
+                rankName = "ゴールド";
+                rankClass = "bg-amber-500 text-white font-bold";
+            } else if (total >= 50) {
+                rankName = "シルバー";
+                rankClass = "bg-blue-600 text-white font-bold";
+            } else if (total >= 0) {
+                rankName = "ブロンズ";
+                rankClass = "bg-amber-700 text-white font-bold";
+            } else {
+                rankName = "見習い";
+                rankClass = "bg-slate-500 text-white";
+            }
+
+            const badge = document.getElementById('userRankBadge');
+            badge.className = `text-xs px-2 py-0.5 rounded shadow-sm ${rankClass}`;
+            badge.innerText = rankName;
+        }
+
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData, null, 2));
+            const dlAnchor = document.createElement('a');
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", `leap_vocab_data_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(dlAnchor);
+            dlAnchor.click();
+            dlAnchor.remove();
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (parsed.words) {
+                        if (parsed.username) appData.username = parsed.username;
+                        LEAP_WORDS_DATA.forEach(w => {
+                            const src = parsed.words[w.id] || {};
+                            const sEJ = src.scoreEJ || 0;
+                            const sJE = src.scoreJE || 0;
+                            appData.words[w.id] = {
+                                scoreEJ: sEJ,
+                                scoreJE: sJE,
+                                ejAttempts: src.ejAttempts || 0,
+                                jeAttempts: src.jeAttempts || 0,
+                                ejReachedPositive: typeof src.ejReachedPositive === 'boolean' ? src.ejReachedPositive : (sEJ > 0),
+                                jeReachedPositive: typeof src.jeReachedPositive === 'boolean' ? src.jeReachedPositive : (sJE > 0)
+                            };
+                        });
+                        document.getElementById('usernameInput').value = appData.username;
+                        saveData();
+                        updateHeader();
+                        showModal("インポート完了", "データを正常に読み込みました。");
+                        switchView('home');
+                    } else {
+                        showModal("エラー", "無効なデータファイルです。");
+                    }
+                } catch (err) {
+                    showModal("エラー", "ファイルの解析に失敗しました。");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function switchView(viewId) {
+            if (ejTimerInterval) clearInterval(ejTimerInterval);
+            if (weakFeedbackTimeout) clearTimeout(weakFeedbackTimeout);
+
+            const homeAuthControls = document.getElementById('homeAuthControls');
+            if (homeAuthControls) {
+                if (viewId === 'home') {
+                    homeAuthControls.classList.remove('hidden');
+                } else {
+                    homeAuthControls.classList.add('hidden');
+                }
+            }
+
+            const homeDataControls = document.getElementById('homeDataControls');
+            if (homeDataControls) {
+                if (viewId === 'home') {
+                    homeDataControls.classList.remove('hidden');
+                } else {
+                    homeDataControls.classList.add('hidden');
+                }
+            }
+
+            const homeGuideButton = document.getElementById('homeGuideButton');
+            if (homeGuideButton) {
+                if (viewId === 'home') {
+                    homeGuideButton.classList.remove('hidden');
+                } else {
+                    homeGuideButton.classList.add('hidden');
+                }
+            }
+
+            ['home', 'block-select', 'ej-settings', 'ej-quiz', 'je-mode', 'weak-quiz', 'list'].forEach(v => {
+                document.getElementById(`view-${v}`).classList.add('hidden');
+            });
+            document.getElementById(`view-${viewId}`).classList.remove('hidden');
+            currentMode = viewId;
+
+            if (viewId === 'list') {
+                switchListBlock(1);
+            }
+        }
+
+        // --- Mode Selectors ---
+        let selectedModeType = 'ej';
+
+        function openBlockSelector(modeType) {
+            selectedModeType = modeType;
+            document.getElementById('blockSelectTitle').innerText = modeType === 'ej' 
+                ? "英語 → 日本語モード: ブロックを選択" 
+                : "日本語 → 英語モード: ブロックを選択";
+            switchView('block-select');
+        }
+
+        function selectBlock(blockNum) {
+            currentBlock = blockNum;
+            if (selectedModeType === 'ej') {
+                setEJTargetFilter('all');
+                switchView('ej-settings');
+            } else {
+                startJEMode(blockNum);
+            }
+        }
+
+        function getWordsByBlock(blockNum) {
+            const start = (blockNum - 1) * 100 + 1;
+            const end = blockNum * 100;
+            return LEAP_WORDS_DATA.filter(w => w.id >= start && w.id <= end);
+        }
+
+        // --- English -> Japanese Mode Logic ---
+        let ejSessionResults = {};
+
+        function setEJTargetFilter(filterType) {
+            ejTargetFilter = filterType;
+            const allBtn = document.getElementById('ejFilterAllBtn');
+            const weakBtn = document.getElementById('ejFilterWeakBtn');
+            if (filterType === 'all') {
+                allBtn.className = "p-3 rounded-xl border-2 border-indigo-600 bg-indigo-50 text-center font-bold text-indigo-700 text-sm transition";
+                weakBtn.className = "p-3 rounded-xl border-2 border-slate-200 hover:border-indigo-400 text-center font-bold text-slate-600 text-sm transition";
+            } else {
+                weakBtn.className = "p-3 rounded-xl border-2 border-indigo-600 bg-indigo-50 text-center font-bold text-indigo-700 text-sm transition";
+                allBtn.className = "p-3 rounded-xl border-2 border-slate-200 hover:border-indigo-400 text-center font-bold text-slate-600 text-sm transition";
+            }
+        }
+
+        function startEJQuiz(seconds) {
+            ejTimerSeconds = seconds;
+            const blockWords = getWordsByBlock(currentBlock);
+            ejQueue = ejTargetFilter === 'nonPositive'
+                ? blockWords.filter(w => appData.words[w.id].scoreEJ <= 0)
+                : blockWords;
+
+            if (ejQueue.length === 0) {
+                showModal("通知", "このブロックにはスコアが0またはマイナスの単語がありません。");
+                return;
+            }
+
+            ejCurrentIndex = 0;
+            ejSessionResults = {};
+            switchView('ej-quiz');
+            loadNextEJWord();
+        }
+
+        function loadNextEJWord() {
+            if (ejCurrentIndex >= ejQueue.length) {
+                finishEJQuiz();
+                return;
+            }
+
+            const wordObj = ejQueue[ejCurrentIndex];
+            document.getElementById('ejProgress').innerText = `問題 ${ejCurrentIndex + 1} / ${ejQueue.length}`;
+            document.getElementById('ejWordEng').innerText = wordObj.eng;
+            document.getElementById('ejWordJap').innerText = wordObj.jap;
+
+            // Hide Japanese & controls
+            const japContainer = document.getElementById('ejWordJapContainer');
+            japContainer.classList.remove('opacity-100', 'translate-y-0');
+            japContainer.classList.add('opacity-0', 'translate-y-2');
+            document.getElementById('ejControls').classList.add('hidden');
+            document.getElementById('ejWaitingMsg').classList.remove('hidden');
+
+            let timeLeft = ejTimerSeconds * 10; // tenth of a second
+            document.getElementById('ejTimerDisplay').innerText = `残り ${(timeLeft / 10).toFixed(1)} 秒`;
+
+            if (ejTimerInterval) clearInterval(ejTimerInterval);
+            ejTimerInterval = setInterval(() => {
+                timeLeft--;
+                if (timeLeft <= 0) {
+                    clearInterval(ejTimerInterval);
+                    document.getElementById('ejTimerDisplay').innerText = `表示完了`;
+                    revealEJWord();
+                } else {
+                    document.getElementById('ejTimerDisplay').innerText = `残り ${(timeLeft / 10).toFixed(1)} 秒`;
+                }
+            }, 100);
+        }
+
+        function revealEJWord() {
+            const japContainer = document.getElementById('ejWordJapContainer');
+            japContainer.classList.remove('opacity-0', 'translate-y-2');
+            japContainer.classList.add('opacity-100', 'translate-y-0');
+            document.getElementById('ejWaitingMsg').classList.add('hidden');
+            document.getElementById('ejControls').classList.remove('hidden');
+        }
+
+        function answerEJ(grade) {
+            const wordObj = ejQueue[ejCurrentIndex];
+            let delta = 0;
+            if (grade === 'circle') delta = 1;
+            else if (grade === 'triangle') delta = 0;
+            else if (grade === 'cross') delta = -1;
+
+            ejSessionResults[wordObj.id] = delta;
+            ejCurrentIndex++;
+            loadNextEJWord();
+        }
+
+        function finishEJQuiz() {
+            // Apply scores at the end of the 100 words
+            for (let id in ejSessionResults) {
+                recordAttemptAndScore(id, 'ej', ejSessionResults[id]);
+            }
+            saveData();
+            updateHeader();
+            showModal("完了！", "100問の学習が完了しました。スコアを更新・保存しました。");
+            switchView('home');
+        }
+
+        function interruptEJMode() {
+            openConfirmModal("これまでの回答分のスコアを保存して中断しますか？", () => {
+                if (ejTimerInterval) clearInterval(ejTimerInterval);
+                let answeredCount = 0;
+                for (let id in ejSessionResults) {
+                    recordAttemptAndScore(id, 'ej', ejSessionResults[id]);
+                    answeredCount++;
+                }
+                ejSessionResults = {};
+                saveData();
+                updateHeader();
+                showModal("中断・保存完了", `回答済みの${answeredCount}問分のスコアを保存して中断しました。`);
+                switchView('home');
+            });
+        }
+
+        // --- Japanese -> English Mode Logic ---
+        let jeSessionJudgments = {};
+
+        function startJEMode(blockNum) {
+            const words = getWordsByBlock(blockNum);
+            jeSessionJudgments = {};
+            const tbody = document.getElementById('jeTableBody');
+            tbody.innerHTML = '';
+
+            words.forEach(w => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition";
+                tr.innerHTML = `
+                    <td class="py-3 px-4 text-slate-400 font-mono text-xs">${w.id}</td>
+                    <td class="py-3 px-4 font-bold text-slate-800">${w.jap}</td>
+                    <td class="py-3 px-4">
+                        <button id="je-reveal-btn-${w.id}" onclick="revealSingleJE(${w.id})" class="bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs px-3 py-1.5 rounded-lg border border-slate-200 font-medium transition">
+                            英語を表示
+                        </button>
+                        <span id="je-word-${w.id}" class="hidden font-extrabold text-indigo-600 text-base tracking-wide">${w.eng}</span>
+                    </td>
+                    <td class="py-3 px-4 text-center space-x-2">
+                        <button id="je-btn-circle-${w.id}" onclick="judgeJE(${w.id}, 1)" class="px-3 py-1 rounded-lg border border-slate-200 text-slate-500 hover:bg-emerald-50 hover:text-emerald-700 font-bold transition">〇</button>
+                        <button id="je-btn-cross-${w.id}" onclick="judgeJE(${w.id}, -1)" class="px-3 py-1 rounded-lg border border-slate-200 text-slate-500 hover:bg-rose-50 hover:text-rose-700 font-bold transition">×</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            switchView('je-mode');
+        }
+
+        function revealSingleJE(id) {
+            document.getElementById(`je-reveal-btn-${id}`).classList.add('hidden');
+            document.getElementById(`je-word-${id}`).classList.remove('hidden');
+        }
+
+        function revealAllJE() {
+            const words = getWordsByBlock(currentBlock);
+            words.forEach(w => revealSingleJE(w.id));
+        }
+
+        function judgeJE(id, delta) {
+            jeSessionJudgments[id] = delta;
+            const btnCircle = document.getElementById(`je-btn-circle-${id}`);
+            const btnCross = document.getElementById(`je-btn-cross-${id}`);
+
+            // Reset styles
+            btnCircle.className = "px-3 py-1 rounded-lg border border-slate-200 text-slate-500 hover:bg-emerald-50 font-bold transition";
+            btnCross.className = "px-3 py-1 rounded-lg border border-slate-200 text-slate-500 hover:bg-rose-50 font-bold transition";
+
+            if (delta === 1) {
+                btnCircle.className = "px-3 py-1 rounded-lg bg-emerald-600 text-white font-bold shadow-sm transition";
+            } else {
+                btnCross.className = "px-3 py-1 rounded-lg bg-rose-600 text-white font-bold shadow-sm transition";
+            }
+        }
+
+        function finishJEMode() {
+            for (let id in jeSessionJudgments) {
+                recordAttemptAndScore(id, 'je', jeSessionJudgments[id]);
+            }
+            saveData();
+            updateHeader();
+            showModal("保存完了", "日本語 → 英語モードの判定スコアを反映・保存しました。");
+            switchView('home');
+        }
+
+        function interruptJEMode() {
+            openConfirmModal("これまでの判定分のスコアを保存して中断しますか？", () => {
+                let judgedCount = 0;
+                for (let id in jeSessionJudgments) {
+                    recordAttemptAndScore(id, 'je', jeSessionJudgments[id]);
+                    judgedCount++;
+                }
+                jeSessionJudgments = {};
+                saveData();
+                updateHeader();
+                showModal("中断・保存完了", `判定済みの${judgedCount}問分のスコアを保存して中断しました。`);
+                switchView('home');
+            });
+        }
+
+        // --- Weak Words Quiz Logic ---
+        function startWeakWordsQuiz() {
+            // 1. Lowest 20 in EJ
+            const sortedEJ = [...LEAP_WORDS_DATA].sort((a, b) => appData.words[a.id].scoreEJ - appData.words[b.id].scoreEJ);
+            const lowest20EJ = sortedEJ.slice(0, 20).map(w => ({ word: w, mode: 'ej' }));
+
+            // 2. Lowest 20 in JE
+            const sortedJE = [...LEAP_WORDS_DATA].sort((a, b) => appData.words[a.id].scoreJE - appData.words[b.id].scoreJE);
+            const lowest20JE = sortedJE.slice(0, 20).map(w => ({ word: w, mode: 'je' }));
+
+            // Combine 40 questions and shuffle
+            weakQuizList = [...lowest20EJ, ...lowest20JE].sort(() => Math.random() - 0.5);
+            weakQuizIndex = 0;
+
+            switchView('weak-quiz');
+            renderWeakQuestion();
+        }
+
+        function getSimilarOrRandomDistractors(targetWord, mode) {
+            const others = LEAP_WORDS_DATA.filter(w => w.id !== targetWord.id);
+            
+            // Sort by spelling similarity (common first letters or similar length)
+            const targetEng = targetWord.eng.toLowerCase();
+            others.sort((a, b) => {
+                const aEng = a.eng.toLowerCase();
+                const bEng = b.eng.toLowerCase();
+                const aSameStart = aEng[0] === targetEng[0] ? 1 : 0;
+                const bSameStart = bEng[0] === targetEng[0] ? 1 : 0;
+                if (aSameStart !== bSameStart) return bSameStart - aSameStart;
+                return Math.abs(aEng.length - targetEng.length) - Math.abs(bEng.length - targetEng.length);
+            });
+
+            // Pick top 15 similar words and randomly select 3 distractors
+            const pool = others.slice(0, 15).sort(() => Math.random() - 0.5);
+            const distractors = [];
+            const usedValues = new Set();
+            usedValues.add(mode === 'ej' ? targetWord.jap : targetWord.eng);
+
+            for (let item of pool) {
+                const val = mode === 'ej' ? item.jap : item.eng;
+                if (!usedValues.has(val)) {
+                    usedValues.add(val);
+                    distractors.push(val);
+                    if (distractors.length === 3) break;
+                }
+            }
+
+            // Fallback if needed
+            if (distractors.length < 3) {
+                for (let item of LEAP_WORDS_DATA) {
+                    const val = mode === 'ej' ? item.jap : item.eng;
+                    if (!usedValues.has(val)) {
+                        usedValues.add(val);
+                        distractors.push(val);
+                        if (distractors.length === 3) break;
+                    }
+                }
+            }
+            return distractors;
+        }
+
+        function renderWeakQuestion() {
+            if (weakFeedbackTimeout) clearTimeout(weakFeedbackTimeout);
+
+            if (weakQuizIndex >= weakQuizList.length) {
+                saveData();
+                updateHeader();
+                showModal("特訓完了！", "40問の苦手単語特訓を完了しました。お疲れ様でした！");
+                switchView('home');
+                return;
+            }
+
+            const q = weakQuizList[weakQuizIndex];
+            document.getElementById('weakProgress').innerText = `問題 ${weakQuizIndex + 1} / 40`;
+
+            const currentWordScore = q.mode === 'ej'
+                ? appData.words[q.word.id].scoreEJ
+                : appData.words[q.word.id].scoreJE;
+            const scoreBadge = document.getElementById('weakCurrentScore');
+            scoreBadge.innerText = `現在のスコア: ${currentWordScore}`;
+            scoreBadge.className = `inline-block text-xs font-bold px-2.5 py-0.5 rounded-full border ${
+                currentWordScore > 0
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    : (currentWordScore < 0
+                        ? 'bg-rose-50 text-rose-700 border-rose-200'
+                        : 'bg-slate-100 text-slate-700 border-slate-200')
+            }`;
+
+            const feedbackEl = document.getElementById('weakFeedback');
+            feedbackEl.classList.add('hidden');
+            feedbackEl.innerText = '';
+
+            const promptEl = document.getElementById('weakQuestionPrompt');
+            const targetEl = document.getElementById('weakTargetWord');
+            const optionsContainer = document.getElementById('weakOptionsContainer');
+            optionsContainer.innerHTML = '';
+
+            let correctAnswer = "";
+            if (q.mode === 'ej') {
+                promptEl.innerText = "【英→日】適切な日本語訳を選んでください";
+                targetEl.innerText = q.word.eng;
+                correctAnswer = q.word.jap;
+            } else {
+                promptEl.innerText = "【日→英】適切な英単語を選んでください";
+                targetEl.innerText = q.word.jap;
+                correctAnswer = q.word.eng;
+            }
+
+            const distractors = getSimilarOrRandomDistractors(q.word, q.mode);
+            const allOptions = [correctAnswer, ...distractors].sort(() => Math.random() - 0.5);
+
+            allOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-4 rounded-xl border border-slate-200 hover:border-amber-500 hover:bg-amber-50 font-medium text-slate-800 transition shadow-sm";
+                btn.innerText = opt;
+                btn.onclick = () => checkWeakAnswer(opt === correctAnswer, correctAnswer, q, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkWeakAnswer(isCorrect, correctAnswer, questionObj, clickedBtn) {
+            const buttons = document.getElementById('weakOptionsContainer').querySelectorAll('button');
+            buttons.forEach(b => {
+                b.disabled = true;
+                if (b.innerText === correctAnswer) {
+                    b.className = "w-full text-left p-4 rounded-xl border-2 border-emerald-500 bg-emerald-50 font-bold text-emerald-800 transition shadow-sm";
+                } else if (b === clickedBtn && !isCorrect) {
+                    b.className = "w-full text-left p-4 rounded-xl border-2 border-rose-500 bg-rose-50 font-bold text-rose-800 transition shadow-sm";
+                } else {
+                    b.className = "w-full text-left p-4 rounded-xl border border-slate-200 bg-slate-50 font-medium text-slate-400 transition";
+                }
+            });
+
+            const feedbackEl = document.getElementById('weakFeedback');
+            feedbackEl.classList.remove('hidden');
+
+            if (isCorrect) {
+                recordAttemptAndScore(questionObj.word.id, questionObj.mode, 1);
+                feedbackEl.className = "mt-3 py-2.5 px-4 rounded-xl text-sm font-bold bg-emerald-50 text-emerald-700 border border-emerald-200";
+                feedbackEl.innerText = "正解！ スコアが +1 されました。（3秒後に次の問題へ進みます）";
+            } else {
+                recordAttemptAndScore(questionObj.word.id, questionObj.mode, -1);
+                feedbackEl.className = "mt-3 py-2.5 px-4 rounded-xl text-sm font-bold bg-rose-50 text-rose-700 border border-rose-200";
+                feedbackEl.innerText = `不正解... 正解は「${correctAnswer}」です。スコアが -1 されました。（3秒後に次の問題へ進みます）`;
+            }
+
+            updateHeader();
+            weakFeedbackTimeout = setTimeout(() => {
+                weakQuizIndex++;
+                renderWeakQuestion();
+            }, 3000);
+        }
+
+        function interruptWeakQuiz() {
+            openConfirmModal(`これまでの解答（${weakQuizIndex}問完了）のスコアを保存して中断しますか？`, () => {
+                if (weakFeedbackTimeout) clearTimeout(weakFeedbackTimeout);
+                saveData();
+                updateHeader();
+                showModal("中断・保存完了", `${weakQuizIndex}問目までのスコアを保存して中断しました。`);
+                switchView('home');
+            });
+        }
+
+        // --- Vocabulary List Logic ---
+        function switchListSort(sortType) {
+            currentListSort = sortType;
+            const sortBtns = {
+                original: document.getElementById('sortBtnOriginal'),
+                high: document.getElementById('sortBtnHigh'),
+                low: document.getElementById('sortBtnLow')
+            };
+            Object.keys(sortBtns).forEach(key => {
+                if (key === sortType) {
+                    sortBtns[key].className = "px-3 py-1.5 rounded-md text-xs font-bold bg-white text-indigo-600 shadow-sm transition";
+                } else {
+                    sortBtns[key].className = "px-3 py-1.5 rounded-md text-xs font-bold text-slate-600 hover:text-slate-900 transition";
+                }
+            });
+            switchListBlock(currentListBlock);
+        }
+
+        function switchListBlock(blockNum) {
+            currentListBlock = blockNum;
+            [1, 2, 3].forEach(n => {
+                const btn = document.getElementById(`listBtn${n}`);
+                if (n === blockNum) {
+                    btn.className = "px-4 py-2 rounded-lg text-sm font-medium bg-indigo-600 text-white transition";
+                } else {
+                    btn.className = "px-4 py-2 rounded-lg text-sm font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 transition";
+                }
+            });
+
+            let words = [...getWordsByBlock(blockNum)];
+            if (currentListSort === 'high') {
+                words.sort((a, b) => {
+                    const totA = appData.words[a.id].scoreEJ + appData.words[a.id].scoreJE;
+                    const totB = appData.words[b.id].scoreEJ + appData.words[b.id].scoreJE;
+                    return totB - totA || a.id - b.id;
+                });
+            } else if (currentListSort === 'low') {
+                words.sort((a, b) => {
+                    const totA = appData.words[a.id].scoreEJ + appData.words[a.id].scoreJE;
+                    const totB = appData.words[b.id].scoreEJ + appData.words[b.id].scoreJE;
+                    return totA - totB || a.id - b.id;
+                });
+            }
+
+            const tbody = document.getElementById('vocabTableBody');
+            tbody.innerHTML = '';
+
+            words.forEach(w => {
+                const sEJ = appData.words[w.id].scoreEJ;
+                const sJE = appData.words[w.id].scoreJE;
+                const tot = sEJ + sJE;
+                const attEJ = appData.words[w.id].ejAttempts || 0;
+                const attJE = appData.words[w.id].jeAttempts || 0;
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition";
+                tr.innerHTML = `
+                    <td class="py-3 px-4 text-slate-400 font-mono text-xs">${w.id}</td>
+                    <td class="py-3 px-4 font-bold text-slate-900">${w.eng}</td>
+                    <td class="py-3 px-4 text-slate-600">${w.jap}</td>
+                    <td class="py-3 px-4 text-center font-semibold ${sEJ > 0 ? 'text-emerald-600' : (sEJ < 0 ? 'text-rose-600' : 'text-slate-400')}">${sEJ}</td>
+                    <td class="py-3 px-4 text-center font-semibold ${sJE > 0 ? 'text-emerald-600' : (sJE < 0 ? 'text-rose-600' : 'text-slate-400')}">${sJE}</td>
+                    <td class="py-3 px-4 text-center font-bold ${tot > 0 ? 'text-indigo-600' : (tot < 0 ? 'text-rose-600' : 'text-slate-600')}">${tot}</td>
+                    <td class="py-3 px-4 text-center text-slate-600 font-medium">${attEJ}回</td>
+                    <td class="py-3 px-4 text-center text-slate-600 font-medium">${attJE}回</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Modal Handler
+        function showModal(title, message) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalMessage').innerText = message;
+            document.getElementById('messageModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('messageModal').classList.add('hidden');
+        }
+
+        // Confirm Modal Handler
+        let pendingConfirmCallback = null;
+
+        function openConfirmModal(message, onConfirm) {
+            document.getElementById('confirmMessage').innerText = message;
+            pendingConfirmCallback = onConfirm;
+            document.getElementById('confirmModal').classList.remove('hidden');
+        }
+
+        function closeConfirmModal(confirmed) {
+            document.getElementById('confirmModal').classList.add('hidden');
+            if (confirmed && typeof pendingConfirmCallback === 'function') {
+                const cb = pendingConfirmCallback;
+                pendingConfirmCallback = null;
+                cb();
+            } else {
+                pendingConfirmCallback = null;
+            }
+        }
+
+        // Usage Modal Handler
+        function openUsageModal() {
+            document.getElementById('usageModal').classList.remove('hidden');
+        }
+
+        function closeUsageModal() {
+            document.getElementById('usageModal').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
