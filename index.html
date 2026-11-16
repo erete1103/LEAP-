@@ -349,19 +349,40 @@
 
     <!-- JavaScript Base & Logic Integration -->
     <script>
-        // サンプル単語データ（300単語ベース）
-        let vocabData = [];
-        for (let i = 1; i <= 300; i++) {
-            vocabData.push({
-                id: i,
-                eng: `word${i}`,
-                jap: `単語の意味 ${i}`,
-                ejScore: 0,
-                jeScore: 0,
-                ejTrials: 0,
-                jeTrials: 0
-            });
+// 英単語データを格納するグローバル変数
+let vocabData = [];
+
+// ページ読み込み時に words.json からデータを非同期で取得して初期化する関数
+async function initVocabData() {
+    try {
+        const response = await fetch('words.json');
+        if (!response.ok) {
+            throw new Error('words.json の取得に失敗しました');
         }
+        const rawData = await response.json();
+
+        // 取得したJSONデータに、スコアや試行回数の初期値を付与してセットする
+        vocabData = rawData.map((item, index) => ({
+            id: item.id || (index + 1),
+            eng: item.eng || item.word,
+            jap: item.jap || item.meaning,
+            ejScore: 0,
+            jeScore: 0,
+            ejTrials: 0,
+            jeTrials: 0
+        }));
+
+        console.log(`単語データ ${vocabData.length} 件の読み込みが完了しました！`);
+    } catch (error) {
+        console.error(error);
+        alert('英単語データ（words.json）の読み込みに失敗しました。ファイルが正しい場所にあるか確認してください。');
+    }
+}
+
+// ページが読み込まれたらすぐにデータを取得・初期化
+window.addEventListener('DOMContentLoaded', () => {
+    initVocabData();
+});
 
         let currentMode = '';
         let selectedBlock = 1;
@@ -563,8 +584,173 @@
         function finishJEMode() { switchView('home'); alert('スコアを保存しました'); }
 
         // 苦手単語特訓
+// --- Weak Words Quiz Logic ---
         function startWeakWordsQuiz() {
-            alert("苦手単語モードは準備中です。");
+            // 1. Lowest 20 in EJ
+            const sortedEJ = [...LEAP_WORDS_DATA].sort((a, b) => appData.words[a.id].scoreEJ - appData.words[b.id].scoreEJ);
+            const lowest20EJ = sortedEJ.slice(0, 20).map(w => ({ word: w, mode: 'ej' }));
+
+            // 2. Lowest 20 in JE
+            const sortedJE = [...LEAP_WORDS_DATA].sort((a, b) => appData.words[a.id].scoreJE - appData.words[b.id].scoreJE);
+            const lowest20JE = sortedJE.slice(0, 20).map(w => ({ word: w, mode: 'je' }));
+
+            // Combine 40 questions and shuffle
+            weakQuizList = [...lowest20EJ, ...lowest20JE].sort(() => Math.random() - 0.5);
+            weakQuizIndex = 0;
+
+            switchView('weak-quiz');
+            renderWeakQuestion();
+        }
+
+        function getSimilarOrRandomDistractors(targetWord, mode) {
+            const others = LEAP_WORDS_DATA.filter(w => w.id !== targetWord.id);
+            
+            // Sort by spelling similarity (common first letters or similar length)
+            const targetEng = targetWord.eng.toLowerCase();
+            others.sort((a, b) => {
+                const aEng = a.eng.toLowerCase();
+                const bEng = b.eng.toLowerCase();
+                const aSameStart = aEng[0] === targetEng[0] ? 1 : 0;
+                const bSameStart = bEng[0] === targetEng[0] ? 1 : 0;
+                if (aSameStart !== bSameStart) return bSameStart - aSameStart;
+                return Math.abs(aEng.length - targetEng.length) - Math.abs(bEng.length - targetEng.length);
+            });
+
+            // Pick top 15 similar words and randomly select 3 distractors
+            const pool = others.slice(0, 15).sort(() => Math.random() - 0.5);
+            const distractors = [];
+            const usedValues = new Set();
+            usedValues.add(mode === 'ej' ? targetWord.jap : targetWord.eng);
+
+            for (let item of pool) {
+                const val = mode === 'ej' ? item.jap : item.eng;
+                if (!usedValues.has(val)) {
+                    usedValues.add(val);
+                    distractors.push(val);
+                    if (distractors.length === 3) break;
+                }
+            }
+
+            // Fallback if needed
+            if (distractors.length < 3) {
+                for (let item of LEAP_WORDS_DATA) {
+                    const val = mode === 'ej' ? item.jap : item.eng;
+                    if (!usedValues.has(val)) {
+                        usedValues.add(val);
+                        distractors.push(val);
+                        if (distractors.length === 3) break;
+                    }
+                }
+            }
+            return distractors;
+        }
+
+        function renderWeakQuestion() {
+            if (weakFeedbackTimeout) clearTimeout(weakFeedbackTimeout);
+
+            if (weakQuizIndex >= weakQuizList.length) {
+                saveData();
+                updateHeader();
+                showModal("特訓完了！", "40問の苦手単語特訓を完了しました。お疲れ様でした！");
+                switchView('home');
+                return;
+            }
+
+            const q = weakQuizList[weakQuizIndex];
+            document.getElementById('weakProgress').innerText = `問題 ${weakQuizIndex + 1} / 40`;
+
+            const currentWordScore = q.mode === 'ej'
+                ? appData.words[q.word.id].scoreEJ
+                : appData.words[q.word.id].scoreJE;
+            const scoreBadge = document.getElementById('weakCurrentScore');
+            scoreBadge.innerText = `現在のスコア: ${currentWordScore}`;
+            scoreBadge.className = `inline-block text-xs font-bold px-2.5 py-0.5 rounded-full border ${
+                currentWordScore > 0
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    : (currentWordScore < 0
+                        ? 'bg-rose-50 text-rose-700 border-rose-200'
+                        : 'bg-slate-100 text-slate-700 border-slate-200')
+            }`;
+
+            const feedbackEl = document.getElementById('weakFeedback');
+            feedbackEl.classList.add('hidden');
+            feedbackEl.innerText = '';
+
+            const promptEl = document.getElementById('weakQuestionPrompt');
+            const targetEl = document.getElementById('weakTargetWord');
+            const optionsContainer = document.getElementById('weakOptionsContainer');
+            optionsContainer.innerHTML = '';
+
+            let correctAnswer = "";
+            if (q.mode === 'ej') {
+                promptEl.innerText = "【英→日】適切な日本語訳を選んでください";
+                targetEl.innerText = q.word.eng;
+                correctAnswer = q.word.jap;
+            } else {
+                promptEl.innerText = "【日→英】適切な英単語を選んでください";
+                targetEl.innerText = q.word.jap;
+                correctAnswer = q.word.eng;
+            }
+
+            const distractors = getSimilarOrRandomDistractors(q.word, q.mode);
+            const allOptions = [correctAnswer, ...distractors].sort(() => Math.random() - 0.5);
+
+            allOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-4 rounded-xl border border-slate-200 hover:border-amber-500 hover:bg-amber-50 font-medium text-slate-800 transition shadow-sm";
+                btn.innerText = opt;
+                btn.onclick = () => checkWeakAnswer(opt === correctAnswer, correctAnswer, q, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkWeakAnswer(isCorrect, correctAnswer, questionObj, clickedBtn) {
+            const buttons = document.getElementById('weakOptionsContainer').querySelectorAll('button');
+            buttons.forEach(b => {
+                b.disabled = true;
+                if (b.innerText === correctAnswer) {
+                    b.className = "w-full text-left p-4 rounded-xl border-2 border-emerald-500 bg-emerald-50 font-bold text-emerald-800 transition shadow-sm";
+                } else if (b === clickedBtn && !isCorrect) {
+                    b.className = "w-full text-left p-4 rounded-xl border-2 border-rose-500 bg-rose-50 font-bold text-rose-800 transition shadow-sm";
+                } else {
+                    b.className = "w-full text-left p-4 rounded-xl border border-slate-200 bg-slate-50 font-medium text-slate-400 transition";
+                }
+            });
+
+            if (isCorrect) {
+                clickedBtn.classList.add('animate-picon');
+            } else {
+                clickedBtn.classList.add('animate-shake');
+            }
+
+            const feedbackEl = document.getElementById('weakFeedback');
+            feedbackEl.classList.remove('hidden');
+
+            if (isCorrect) {
+                recordAttemptAndScore(questionObj.word.id, questionObj.mode, 1);
+                feedbackEl.className = "mt-3 py-2.5 px-4 rounded-xl text-sm font-bold bg-emerald-50 text-emerald-700 border border-emerald-200";
+                feedbackEl.innerText = "正解！ スコアが +1 されました。（3秒後に次の問題へ進みます）";
+            } else {
+                recordAttemptAndScore(questionObj.word.id, questionObj.mode, -1);
+                feedbackEl.className = "mt-3 py-2.5 px-4 rounded-xl text-sm font-bold bg-rose-50 text-rose-700 border border-rose-200";
+                feedbackEl.innerText = `不正解... 正解は「${correctAnswer}」です。スコアが -1 されました。（3秒後に次の問題へ進みます）`;
+            }
+
+            updateHeader();
+            weakFeedbackTimeout = setTimeout(() => {
+                weakQuizIndex++;
+                renderWeakQuestion();
+            }, 3000);
+        }
+
+        function interruptWeakQuiz() {
+            openConfirmModal(`これまでの解答（${weakQuizIndex}問完了）のスコアを保存して中断しますか？`, () => {
+                if (weakFeedbackTimeout) clearTimeout(weakFeedbackTimeout);
+                saveData();
+                updateHeader();
+                showModal("中断・保存完了", `${weakQuizIndex}問目までのスコアを保存して中断しました。`);
+                switchView('home');
+            });
         }
 
         // リスト表示
