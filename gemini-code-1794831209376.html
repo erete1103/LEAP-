@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>英単語帳「LEAP」暗記サイト</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; -webkit-text-size-adjust: 100%; }
+        @keyframes burn {
+            0%, 100% { transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 2px rgba(239, 68, 68, 0.8)); }
+            50% { transform: scale(1.15) rotate(3deg); filter: drop-shadow(0 0 8px rgba(249, 115, 22, 1)); }
+        }
+        .animate-burn {
+            animation: burn 1.2s ease-in-out infinite;
+            display: inline-block;
+        }
+        @keyframes picon {
+            0% { transform: scale(1); }
+            30% { transform: scale(1.25); filter: brightness(1.1); }
+            60% { transform: scale(0.95); }
+            100% { transform: scale(1); }
+        }
+        .animate-picon {
+            animation: picon 0.35s ease-in-out;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+        .animate-shake {
+            animation: shake 0.35s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header / Navbar -->
+    <header class="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-2 sm:px-4 py-2 sm:py-3 flex flex-wrap justify-between items-center gap-2">
+            <div class="flex items-center justify-between w-full sm:w-auto space-x-2">
+                <div class="flex items-center space-x-2 cursor-pointer" onclick="switchView('home')">
+                    <span class="bg-indigo-600 text-white font-bold px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg shadow-sm text-sm sm:text-lg">LEAP</span>
+                    <h1 class="text-sm sm:text-xl font-bold tracking-tight text-slate-900">英単語帳暗記サイト</h1>
+                </div>
+                <button id="homeGuideButton" onclick="openUsageModal()" class="text-[10px] sm:text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 px-2 py-1 rounded-lg font-semibold transition whitespace-nowrap">使い方</button>
+            </div>
+            <div class="flex items-center gap-1.5 sm:gap-3 flex-wrap w-full sm:w-auto justify-between sm:justify-end">
+                <!-- User Profile & Rank -->
+                <div class="flex items-center space-x-1.5 bg-slate-100 px-2 sm:px-3 py-1 rounded-full border border-slate-200 max-w-full overflow-x-auto">
+                    <span id="userRankBadge" class="text-[10px] sm:text-xs font-bold px-1.5 py-0.5 rounded text-white bg-slate-500 whitespace-nowrap">見習い</span>
+                    <input type="text" id="usernameInput" value="学習者" class="bg-transparent font-semibold text-xs sm:text-sm focus:outline-none w-14 sm:w-24 text-slate-700" onchange="updateUsername(this.value)" title="クリックしてユーザー名変更">
+                    <span class="text-[10px] sm:text-xs text-slate-500 whitespace-nowrap">合: <strong id="totalScoreDisplay">0</strong></span>
+                    <span class="text-[10px] sm:text-xs text-slate-600 flex items-center space-x-0.5 pl-1 border-l border-slate-300 whitespace-nowrap" title="連続ログイン日数">
+                        <span class="animate-burn">🔥</span>
+                        <strong id="loginStreakDisplay">1</strong>日
+                    </span>
+                </div>
+                <!-- Account Login/Logout & Reset Controls -->
+                <div id="homeAuthControls" class="flex items-center gap-1 flex-wrap">
+                    <div id="authStatusBadge" class="hidden inline-flex items-center space-x-1 text-[10px] sm:text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-1 rounded-lg font-medium max-w-[150px] sm:max-w-[220px]">
+                        <img id="authAvatarImg" src="" alt="アイコン" referrerpolicy="no-referrer" class="hidden w-4 h-4 sm:w-5 sm:h-5 rounded-full object-cover border border-emerald-300 flex-shrink-0" onerror="this.classList.add('hidden'); document.getElementById('authAvatarFallback').classList.remove('hidden');">
+                        <span id="authAvatarFallback" class="hidden w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-emerald-600 text-white text-[9px] font-bold flex items-center justify-center flex-shrink-0">U</span>
+                        <span id="authStatusText" class="truncate"></span>
+                    </div>
+                    <button id="openAuthModalBtn" onclick="openAuthModal()" class="text-[10px] sm:text-xs bg-slate-800 hover:bg-slate-900 text-white px-2.5 py-1 rounded-lg font-medium shadow-sm transition whitespace-nowrap">ログイン</button>
+                    <button id="resetAccountDataBtn" onclick="startTripleResetConfirm()" class="hidden text-[10px] sm:text-xs bg-rose-600 hover:bg-rose-700 text-white px-2 py-1 rounded-lg font-medium shadow-sm transition whitespace-nowrap">リセット</button>
+                    <button id="logoutBtn" onclick="handleLogout()" class="hidden text-[10px] sm:text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 px-2 py-1 rounded-lg font-medium transition whitespace-nowrap">ログアウト</button>
+                </div>
+                <!-- Data Save/Load/Export/Import -->
+                <div id="homeDataControls" class="flex items-center gap-1 flex-wrap">
+                    <button onclick="exportData()" class="text-[10px] sm:text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-2 py-1 rounded font-medium transition">EX</button>
+                    <label class="text-[10px] sm:text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-2 py-1 rounded font-medium transition cursor-pointer">
+                        IM<input type="file" id="importFile" class="hidden" accept=".json" onchange="importData(event)">
+                    </label>
+                    <button onclick="loadData(true)" class="text-[10px] sm:text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-2 py-1 rounded font-medium transition">ロード</button>
+                    <button onclick="saveData()" class="text-[10px] sm:text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded font-medium shadow-sm transition">セーブ</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-2 sm:px-4 py-3 sm:py-6">
+
+        <!-- 1. Home View -->
+        <div id="view-home" class="space-y-4 sm:space-y-6">
+            <div class="bg-gradient-to-r from-indigo-500 to-violet-600 rounded-2xl p-4 sm:p-6 text-white shadow-md">
+                <h2 class="text-xl sm:text-2xl font-bold mb-1 sm:mb-2">LEAP英単語暗記プラットフォーム</h2>
+                <p class="text-indigo-100 text-xs sm:text-sm">300個の厳選された英単語を効率的に暗記・確認しましょう。</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                <!-- 英語→日本語モード -->
+                <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition flex flex-col justify-between">
+                    <div>
+                        <div class="w-10 h-10 sm:w-12 sm:h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center font-bold text-lg sm:text-xl mb-3 sm:mb-4">英→日</div>
+                        <h3 class="text-base sm:text-lg font-bold text-slate-900 mb-1">英語→日本語モード</h3>
+                        <p class="text-slate-600 text-xs sm:text-sm mb-4">英単語を一つ一つ表示し、時間経過で自動で日本語が表示されます。〇△×で記憶度を判定します。</p>
+                    </div>
+                    <button onclick="openBlockSelector('ej')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 px-4 rounded-xl transition shadow-sm text-sm sm:text-base">
+                        モードを開始する
+                    </button>
+                </div>
+
+                <!-- 日本語→英語モード -->
+                <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition flex flex-col justify-between">
+                    <div>
+                        <div class="w-10 h-10 sm:w-12 sm:h-12 bg-violet-50 text-violet-600 rounded-xl flex items-center justify-center font-bold text-lg sm:text-xl mb-3 sm:mb-4">日→英</div>
+                        <h3 class="text-base sm:text-lg font-bold text-slate-900 mb-1">日本語→英語モード</h3>
+                        <p class="text-slate-600 text-xs sm:text-sm mb-4">100個の日本語訳を表にし、英語を隠した状態でノートに書き、サイトで答え合わせを行います（〇×判定）。</p>
+                    </div>
+                    <button onclick="openBlockSelector('je')" class="w-full bg-violet-600 hover:bg-violet-700 text-white font-medium py-2.5 px-4 rounded-xl transition shadow-sm text-sm sm:text-base">
+                        モードを開始する
+                    </button>
+                </div>
+
+                <!-- 苦手単語 -->
+                <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition flex flex-col justify-between">
+                    <div>
+                        <div class="w-10 h-10 sm:w-12 sm:h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center font-bold text-lg sm:text-xl mb-3 sm:mb-4">苦手</div>
+                        <h3 class="text-base sm:text-lg font-bold text-slate-900 mb-1">苦手単語</h3>
+                        <p class="text-slate-600 text-xs sm:text-sm mb-4">両モードでスコアの低い下位20単語、合計40単語を4択問題形式で集中的に復習します。</p>
+                    </div>
+                    <button onclick="startWeakWordsQuiz()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-medium py-2.5 px-4 rounded-xl transition shadow-sm text-sm sm:text-base">
+                        苦手単語を特訓する
+                    </button>
+                </div>
+
+                <!-- 英単語リスト -->
+                <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition flex flex-col justify-between">
+                    <div>
+                        <div class="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center font-bold text-lg sm:text-xl mb-3 sm:mb-4">一覧</div>
+                        <h3 class="text-base sm:text-lg font-bold text-slate-900 mb-1">英単語リスト</h3>
+                        <p class="text-slate-600 text-xs sm:text-sm mb-4">300個の単語リストを100個ごとに確認し、各単語のスコア状況を一覧でチェックできます。</p>
+                    </div>
+                    <button onclick="switchView('list')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 px-4 rounded-xl transition shadow-sm text-sm sm:text-base">
+                        リストを表示する
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Block Selector View -->
+        <div id="view-block-select" class="hidden max-w-xl mx-auto bg-white p-5 sm:p-8 rounded-2xl shadow-sm border border-slate-200 space-y-4 sm:space-y-6">
+            <h2 id="blockSelectTitle" class="text-lg sm:text-xl font-bold text-slate-900">ブロックを選択してください</h2>
+            <div id="blockSelectorContainer" class="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
+                <!-- 動的生成または静的ブロック -->
+                <button onclick="selectBlock(1)" class="w-full text-left p-4 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/50 transition flex justify-between items-center">
+                    <div>
+                        <div class="font-bold text-slate-900 text-sm sm:text-base">ブロック 1 (1 〜 100)</div>
+                        <div class="text-xs text-slate-500">基礎・重要単語</div>
+                    </div>
+                    <span class="text-indigo-600 font-bold text-sm">選択 →</span>
+                </button>
+                <button onclick="selectBlock(2)" class="w-full text-left p-4 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/50 transition flex justify-between items-center">
+                    <div>
+                        <div class="font-bold text-slate-900 text-sm sm:text-base">ブロック 2 (101 〜 200)</div>
+                        <div class="text-xs text-slate-500">標準・発展単語</div>
+                    </div>
+                    <span class="text-indigo-600 font-bold text-sm">選択 →</span>
+                </button>
+                <button onclick="selectBlock(3)" class="w-full text-left p-4 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/50 transition flex justify-between items-center">
+                    <div>
+                        <div class="font-bold text-slate-900 text-sm sm:text-base">ブロック 3 (201 〜 300)</div>
+                        <div class="text-xs text-slate-500">応用・難関単語</div>
+                    </div>
+                    <span class="text-indigo-600 font-bold text-sm">選択 →</span>
+                </button>
+            </div>
+            <button onclick="switchView('home')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2.5 rounded-xl transition text-sm">
+                ホームに戻る
+            </button>
+        </div>
+
+        <!-- 3. Timer & Settings for English -> Japanese Mode -->
+        <div id="view-ej-settings" class="hidden max-w-xl mx-auto bg-white p-5 sm:p-8 rounded-2xl shadow-sm border border-slate-200 space-y-4 sm:space-y-6">
+            <h2 class="text-lg sm:text-xl font-bold text-slate-900">英語 → 日本語モード設定</h2>
+            <div class="space-y-2">
+                <p class="text-xs sm:text-sm text-slate-600">出題対象を選択してください。</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <button id="ejFilterAllBtn" onclick="setEJTargetFilter('all')" class="p-3 rounded-xl border-2 border-indigo-600 bg-indigo-50 text-center font-bold text-indigo-700 text-xs sm:text-sm transition">
+                        100単語すべてに挑戦
+                    </button>
+                    <button id="ejFilterWeakBtn" onclick="setEJTargetFilter('nonPositive')" class="p-3 rounded-xl border-2 border-slate-200 hover:border-indigo-400 text-center font-bold text-slate-600 text-xs sm:text-sm transition">
+                        スコアが0またはマイナスの単語のみ
+                    </button>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <p class="text-xs sm:text-sm text-slate-600">日本語が表示されるまでの経過時間を選択してください。</p>
+                <div class="grid grid-cols-3 gap-3">
+                    <button onclick="startEJQuiz(3)" class="p-3 sm:p-4 rounded-xl border-2 border-indigo-200 hover:border-indigo-600 hover:bg-indigo-50 text-center font-bold text-indigo-600 text-sm sm:text-base transition">
+                        3 秒
+                    </button>
+                    <button onclick="startEJQuiz(5)" class="p-3 sm:p-4 rounded-xl border-2 border-indigo-200 hover:border-indigo-600 hover:bg-indigo-50 text-center font-bold text-indigo-600 text-sm sm:text-base transition">
+                        5 秒
+                    </button>
+                    <button onclick="startEJQuiz(10)" class="p-3 sm:p-4 rounded-xl border-2 border-indigo-200 hover:border-indigo-600 hover:bg-indigo-50 text-center font-bold text-indigo-600 text-sm sm:text-base transition">
+                        10 秒
+                    </button>
+                </div>
+            </div>
+            <button onclick="openBlockSelector('ej')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2.5 rounded-xl transition text-sm">
+                ブロック選択に戻る
+            </button>
+        </div>
+
+        <!-- 4. English -> Japanese Mode Quiz View (チラ見えバグ完全修正) -->
+        <div id="view-ej-quiz" class="hidden max-w-xl mx-auto bg-white p-5 sm:p-8 rounded-2xl shadow-sm border border-slate-200 space-y-4 sm:space-y-6">
+            <div class="flex justify-between items-center text-xs sm:text-sm text-slate-500 border-b pb-3">
+                <span id="ejProgress">問題 1 / 100</span>
+                <div class="flex items-center space-x-2 sm:space-x-3">
+                    <span id="ejTimerDisplay" class="font-bold text-indigo-600">残り 5.0 秒</span>
+                    <button onclick="interruptEJMode()" class="text-[11px] sm:text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1.5 rounded-lg font-medium transition border border-slate-200 whitespace-nowrap">中断・保存</button>
+                </div>
+            </div>
+
+            <div class="text-center py-6 sm:py-10 space-y-4">
+                <div id="ejWordEng" class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-wide break-words">achievement</div>
+                <!-- チラ見え防止のため初期状態を opacity-0 および pointer-events-none に徹底固定 -->
+                <div id="ejWordJapContainer" class="opacity-0 transform translate-y-2 transition-all duration-200 pointer-events-none">
+                    <div id="ejWordJap" class="text-xl sm:text-2xl font-bold text-indigo-600 bg-indigo-50 py-3 px-6 rounded-xl inline-block">達成する</div>
+                </div>
+            </div>
+
+            <div id="ejControls" class="hidden grid grid-cols-3 gap-2 sm:gap-4 pt-4 border-t">
+                <button onclick="answerEJ('circle', this)" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold py-3 rounded-xl transition text-base sm:text-lg flex flex-col sm:flex-row items-center justify-center sm:space-x-1">
+                    <span>〇</span> <span class="text-[10px] sm:text-xs font-normal">(+1)</span>
+                </button>
+                <button onclick="answerEJ('triangle', this)" class="bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 font-bold py-3 rounded-xl transition text-base sm:text-lg flex flex-col sm:flex-row items-center justify-center sm:space-x-1">
+                    <span>△</span> <span class="text-[10px] sm:text-xs font-normal">(±0)</span>
+                </button>
+                <button onclick="answerEJ('cross', this)" class="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold py-3 rounded-xl transition text-base sm:text-lg flex flex-col sm:flex-row items-center justify-center sm:space-x-1">
+                    <span>×</span> <span class="text-[10px] sm:text-xs font-normal">(-1)</span>
+                </button>
+            </div>
+            <div id="ejWaitingMsg" class="text-center text-xs sm:text-sm text-slate-400 py-2">
+                日本語が表示されるのを待っています...
+            </div>
+        </div>
+
+        <!-- 5. Japanese -> English Mode View -->
+        <div id="view-je-mode" class="hidden max-w-4xl mx-auto bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4 sm:space-y-6">
+            <div class="flex flex-wrap justify-between items-center gap-3 border-b pb-4">
+                <div>
+                    <h2 class="text-lg sm:text-xl font-bold text-slate-900">日本語 → 英語モード</h2>
+                    <p class="text-[11px] sm:text-xs text-slate-500">ノートに英語を書き、ボタンで確認しながら〇×でスコアをつけましょう。</p>
+                </div>
+                <div class="flex items-center gap-1.5 flex-wrap">
+                    <button onclick="revealAllJE()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-medium transition whitespace-nowrap">一括表示</button>
+                    <button onclick="interruptJEMode()" class="bg-amber-100 hover:bg-amber-200 text-amber-800 px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-medium transition whitespace-nowrap">中断・保存</button>
+                    <button onclick="finishJEMode()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-medium transition shadow-sm whitespace-nowrap">終了・保存</button>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto max-h-[65vh]">
+                <table class="w-full text-left border-collapse min-w-[500px]">
+                    <thead class="sticky top-0 bg-white shadow-sm">
+                        <tr class="border-b border-slate-200 text-slate-400 text-[11px] sm:text-xs uppercase">
+                            <th class="py-2.5 px-3 font-semibold">No.</th>
+                            <th class="py-2.5 px-3 font-semibold">日本語訳</th>
+                            <th class="py-2.5 px-3 font-semibold">英単語</th>
+                            <th class="py-2.5 px-3 font-semibold text-center">判定 (〇 / ×)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="jeTableBody" class="divide-y divide-slate-100 text-xs sm:text-sm">
+                        <!-- Dynamic rows -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 6. Weak Words Mode View -->
+        <div id="view-weak-quiz" class="hidden max-w-xl mx-auto bg-white p-5 sm:p-8 rounded-2xl shadow-sm border border-slate-200 space-y-4 sm:space-y-6">
+            <div class="flex justify-between items-center text-xs sm:text-sm text-slate-500 border-b pb-3">
+                <span id="weakProgress">問題 1 / 40</span>
+                <div class="flex items-center space-x-2 sm:space-x-3">
+                    <span class="font-bold text-amber-600 text-xs sm:text-sm">苦手単語特訓</span>
+                    <button onclick="interruptWeakQuiz()" class="text-[11px] sm:text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1.5 rounded-lg font-medium transition border border-slate-200 whitespace-nowrap">中断・保存</button>
+                </div>
+            </div>
+
+            <div class="text-center py-4 sm:py-6 space-y-2">
+                <div class="text-[10px] sm:text-xs uppercase tracking-wider text-slate-400 font-semibold" id="weakQuestionPrompt">次の単語の意味を選んでください</div>
+                <div>
+                    <span id="weakCurrentScore" class="inline-block text-[11px] sm:text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">現在のスコア: 0</span>
+                </div>
+                <div id="weakTargetWord" class="text-2xl sm:text-3xl font-extrabold text-slate-900 break-words">achieve</div>
+                <div id="weakFeedback" class="hidden mt-2 py-1.5 px-3 rounded-xl text-xs sm:text-sm font-bold"></div>
+            </div>
+
+            <div id="weakOptionsContainer" class="space-y-2.5 sm:space-y-3">
+                <!-- 4 Options -->
+            </div>
+        </div>
+
+        <!-- 7. Vocabulary List View -->
+        <div id="view-list" class="hidden max-w-6xl mx-auto bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4 sm:space-y-6">
+            <div class="flex flex-wrap justify-between items-center gap-3 border-b pb-4">
+                <div class="flex items-center space-x-2 sm:space-x-3">
+                    <h2 class="text-lg sm:text-xl font-bold text-slate-900">英単語表リスト</h2>
+                    <button onclick="switchView('home')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-3 py-1.5 sm:py-2 rounded-lg transition whitespace-nowrap">
+                        ホームに戻る
+                    </button>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                    <div class="flex items-center space-x-1 bg-slate-100 p-1 rounded-lg text-xs overflow-x-auto max-w-full">
+                        <button onclick="switchListSort('original')" id="sortBtnOriginal" class="px-2.5 py-1.5 rounded-md font-bold bg-white text-indigo-600 shadow-sm transition whitespace-nowrap">もとの順番</button>
+                        <button onclick="switchListSort('high')" id="sortBtnHigh" class="px-2.5 py-1.5 rounded-md font-bold text-slate-600 hover:text-slate-900 transition whitespace-nowrap">高スコア順</button>
+                        <button onclick="switchListSort('low')" id="sortBtnLow" class="px-2.5 py-1.5 rounded-md font-bold text-slate-600 hover:text-slate-900 transition whitespace-nowrap">低スコア順</button>
+                    </div>
+                    <div class="flex space-x-1 sm:space-x-2">
+                        <button onclick="switchListBlock(1)" id="listBtn1" class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium bg-indigo-600 text-white transition">1-100</button>
+                        <button onclick="switchListBlock(2)" id="listBtn2" class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 transition">101-200</button>
+                        <button onclick="switchListBlock(3)" id="listBtn3" class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 transition">201-300</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto max-h-[65vh]">
+                <table class="w-full text-left border-collapse min-w-[700px]">
+                    <thead class="sticky top-0 bg-white shadow-sm">
+                        <tr class="border-b border-slate-200 text-slate-400 text-[11px] sm:text-xs uppercase">
+                            <th class="py-2.5 px-3 font-semibold">No.</th>
+                            <th class="py-2.5 px-3 font-semibold">英単語</th>
+                            <th class="py-2.5 px-3 font-semibold">日本語訳</th>
+                            <th class="py-2.5 px-3 font-semibold text-center">英→日 スコア</th>
+                            <th class="py-2.5 px-3 font-semibold text-center">日→英 スコア</th>
+                            <th class="py-2.5 px-3 font-semibold text-center">総合スコア</th>
+                            <th class="py-2.5 px-3 font-semibold text-center">英→日 試行</th>
+                            <th class="py-2.5 px-3 font-semibold text-center">日→英 試行</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vocabTableBody" class="divide-y divide-slate-100 text-xs sm:text-sm">
+                        <!-- Dynamic rows -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Message Modal -->
+    <div id="messageModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white max-w-md w-full p-6 rounded-2xl shadow-xl space-y-4 text-center">
+            <h3 id="modalTitle" class="text-base sm:text-lg font-bold text-slate-900">通知</h3>
+            <p id="modalMessage" class="text-slate-600 text-xs sm:text-sm">メッセージ内容</p>
+            <button onclick="closeModal()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-xl transition shadow-sm text-sm">
+                閉じる
+            </button>
+        </div>
+    </div>
+
+    <!-- Confirm Modal -->
+    <div id="confirmModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white max-w-md w-full p-6 rounded-2xl shadow-xl space-y-4 text-center">
+            <h3 class="text-base sm:text-lg font-bold text-slate-900">学習の中断確認</h3>
+            <p id="confirmMessage" class="text-slate-600 text-xs sm:text-sm">ここまでのスコアを保存して中断しますか？</p>
+            <div class="grid grid-cols-2 gap-3 pt-2">
+                <button onclick="closeConfirmModal(false)" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2.5 rounded-xl transition text-sm">
+                    続ける
+                </button>
+                <button onclick="closeConfirmModal(true)" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-xl transition shadow-sm text-sm">
+                    中断して保存
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Usage Modal -->
+    <div id="usageModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white max-w-2xl w-full p-6 rounded-2xl shadow-xl space-y-4 max-h-[85vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+                <h3 class="text-base sm:text-lg font-bold text-slate-900">このサイトの使い方</h3>
+                <button onclick="closeUsageModal()" class="text-slate-400 hover:text-slate-600 font-bold text-lg px-2">×</button>
+            </div>
+            <div class="space-y-3 text-xs sm:text-sm text-slate-700 text-left leading-relaxed">
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                    <h4 class="font-bold text-indigo-700 mb-1">1. 英語→日本語モード</h4>
+                    <p>100単語ずつのブロックと出題対象、制限時間を選んで開始します。表示された日本語を見て記憶度を判定します。</p>
+                </div>
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                    <h4 class="font-bold text-violet-700 mb-1">2. 日本語→英語モード</h4>
+                    <p>100個の日本語訳が一覧表示され、ノートに書いた後に答え合わせを行ってスコアをつけます。</p>
+                </div>
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                    <h4 class="font-bold text-amber-700 mb-1">3. 苦手単語</h4>
+                    <p>スコアが低い下位20単語（合計40単語）を4択問題形式で特訓します。</p>
+                </div>
+            </div>
+            <button onclick="closeUsageModal()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-xl transition shadow-sm text-sm">
+                閉じる
+            </button>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white max-w-md w-full p-6 rounded-2xl shadow-xl space-y-4 sm:space-y-5">
+            <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+                <h3 class="text-base sm:text-lg font-bold text-slate-900">ログイン・新規登録</h3>
+                <button onclick="closeAuthModal()" class="text-slate-400 hover:text-slate-600 font-bold text-lg px-2">×</button>
+            </div>
+            <p class="text-[11px] sm:text-xs text-slate-500">ログインするとデータをクラウド同期できます。</p>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">メールアドレス</label>
+                    <input type="email" id="authEmailInput" placeholder="example@email.com" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">パスワード（6文字以上）</label>
+                    <input type="password" id="authPasswordInput" placeholder="••••••••" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-indigo-500">
+                </div>
+                <div id="auth-error-msg" class="hidden text-xs text-rose-600 bg-rose-50 border border-rose-200 px-3 py-2 rounded-lg"></div>
+                <div class="grid grid-cols-2 gap-3 pt-1">
+                    <button id="btn-email-login" onclick="handleEmailLogin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-xl transition text-xs sm:text-sm shadow-sm">
+                        ログイン
+                    </button>
+                    <button id="btn-email-register" onclick="handleEmailSignUp()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-2.5 rounded-xl transition text-xs sm:text-sm">
+                        新規登録
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // アプリ全体のビュー切り替え関数（既存ロジック維持）
+        function switchView(viewId) {
+            const views = ['view-home', 'view-block-select', 'view-ej-settings', 'view-ej-quiz', 'view-je-mode', 'view-weak-quiz', 'view-list'];
+            views.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.add('hidden');
+            });
+            const target = document.getElementById('view-' + viewId);
+            if (target) target.classList.remove('hidden');
+        }
+
+        function openUsageModal() { document.getElementById('usageModal').classList.remove('hidden'); }
+        function closeUsageModal() { document.getElementById('usageModal').classList.add('hidden'); }
+        function openAuthModal() { document.getElementById('authModal').classList.remove('hidden'); }
+        function closeAuthModal() { document.getElementById('authModal').classList.add('hidden'); }
+        function closeModal() { document.getElementById('messageModal').classList.add('hidden'); }
+        function updateUsername(name) { console.log('Username updated:', name); }
+        function saveData() { alert('データをセーブしました'); }
+        function loadData() { alert('データをロードしました'); }
+        function exportData() { alert('エクスポートしました'); }
+        function importData(e) { console.log('Imported file', e); }
+
+        // 英語→日本語モードでの解答チラ見えを防ぐためのリセット処理（例）
+        function resetEJDisplay() {
+            const japContainer = document.getElementById('ejWordJapContainer');
+            if (japContainer) {
+                japContainer.classList.add('opacity-0', 'pointer-events-none');
+                japContainer.classList.remove('opacity-100');
+            }
+            const controls = document.getElementById('ejControls');
+            if (controls) controls.classList.add('hidden');
+            const waitingMsg = document.getElementById('ejWaitingMsg');
+            if (waitingMsg) waitingMsg.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
