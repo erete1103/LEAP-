@@ -83,8 +83,8 @@
         </div>
     </header>
 
-    <!-- Main Container -->
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-6">
+　　<!-- Main Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-4 py-4 sm:py-6">
 
         <!-- 1. Home View -->
         <div id="view-home" class="space-y-6">
@@ -492,13 +492,14 @@
         let currentUser = null;
         let unsubscribeCloudSync = null;
 
-        function updateAuthUI(user) {
+function updateAuthUI(user) {
             const statusBadge = document.getElementById('authStatusBadge');
             const statusText = document.getElementById('authStatusText');
             const avatarImg = document.getElementById('authAvatarImg');
             const avatarFallback = document.getElementById('authAvatarFallback');
             const openBtn = document.getElementById('openAuthModalBtn');
             const logoutBtn = document.getElementById('logoutBtn');
+            const resetBtn = document.getElementById('resetAccountDataBtn');
             if (!statusBadge || !statusText || !avatarImg || !avatarFallback || !openBtn || !logoutBtn) return;
 
             if (user && !user.isAnonymous) {
@@ -526,6 +527,7 @@
                 statusBadge.classList.remove('hidden');
                 openBtn.classList.add('hidden');
                 logoutBtn.classList.remove('hidden');
+                if (resetBtn) resetBtn.classList.remove('hidden');
             } else {
                 statusBadge.classList.add('hidden');
                 statusText.textContent = '';
@@ -534,6 +536,7 @@
                 avatarFallback.classList.add('hidden');
                 openBtn.classList.remove('hidden');
                 logoutBtn.classList.add('hidden');
+                if (resetBtn) resetBtn.classList.add('hidden');
             }
         }
 
@@ -1409,7 +1412,68 @@
                 pendingConfirmCallback = null;
             }
         }
+// Triple-Confirmation Account Data Reset
+        function startTripleResetConfirm() {
+            if (!window.fbAuth || !window.fbAuth.currentUser || window.fbAuth.currentUser.isAnonymous) {
+                showModal("エラー", "アカウントにログインしている状態でのみリセットできます。");
+                return;
+            }
 
+            openConfirmModal(
+                "【確認 1 / 3】本当に学習データをリセットしますか？\n現在のスコア・試行回数・連続ログイン日数がすべて初期化されます。",
+                () => {
+                    setTimeout(() => {
+                        openConfirmModal(
+                            "【確認 2 / 3】リセットするとクラウド上のデータも上書きされ、元の状態には戻せません。\n本当に続行しますか？",
+                            () => {
+                                setTimeout(() => {
+                                    openConfirmModal(
+                                        "【最終確認 3 / 3】これが最後の確認です。\n「OK」を押すと、すべての学習データが完全にリセットされます。",
+                                        async () => {
+                                            await executeAccountDataReset();
+                                        }
+                                    );
+                                }, 150);
+                            }
+                        );
+                    }, 150);
+                }
+            );
+        }
+
+        async function executeAccountDataReset() {
+            appData.username = "学習者";
+            appData.streak = 1;
+            appData.lastLoginDate = new Date().toLocaleDateString('ja-JP');
+
+            LEAP_WORDS_DATA.forEach(w => {
+                appData.words[w.id] = {
+                    scoreEJ: 0,
+                    scoreJE: 0,
+                    ejAttempts: 0,
+                    jeAttempts: 0,
+                    ejReachedPositive: false,
+                    jeReachedPositive: false
+                };
+            });
+
+            const input = document.getElementById('usernameInput');
+            if (input) input.value = appData.username;
+
+            localStorage.setItem('leap_app_data', JSON.stringify({
+                username: appData.username,
+                streak: appData.streak,
+                lastLoginDate: appData.lastLoginDate,
+                words: appData.words
+            }));
+
+            if (typeof window.syncToCloud === 'function') {
+                await window.syncToCloud();
+            }
+
+            if (typeof updateHeader === 'function') updateHeader();
+            showModal("リセット完了", "学習データとクラウドデータをすべて初期状態にリセットしました。");
+        }
         // Usage Modal Handler
         function openUsageModal() {
             document.getElementById('usageModal').classList.remove('hidden');
