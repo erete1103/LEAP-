@@ -38,44 +38,46 @@
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
     <!-- Header / Navbar -->
+<!-- Header / Navbar -->
     <header class="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
-            <div class="flex items-center space-x-3">
-                <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('home')">
-                    <span class="bg-indigo-600 text-white font-bold px-3 py-1.5 rounded-lg shadow-sm text-lg">LEAP</span>
-                    <h1 class="text-xl font-bold tracking-tight text-slate-900">英単語帳暗記サイト</h1>
+        <div class="max-w-7xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3 flex flex-wrap justify-between items-center gap-2 sm:gap-4">
+            <div class="flex items-center justify-between w-full sm:w-auto space-x-2 sm:space-x-3">
+                <div class="flex items-center space-x-2 sm:space-x-3 cursor-pointer" onclick="switchView('home')">
+                    <span class="bg-indigo-600 text-white font-bold px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg shadow-sm text-base sm:text-lg">LEAP</span>
+                    <h1 class="text-base sm:text-xl font-bold tracking-tight text-slate-900">英単語帳暗記サイト</h1>
                 </div>
-                <button id="homeGuideButton" onclick="openUsageModal()" class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 px-3 py-1.5 rounded-lg font-semibold transition">このサイトの使い方</button>
+                <button id="homeGuideButton" onclick="openUsageModal()" class="text-[11px] sm:text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 px-2.5 py-1.5 rounded-lg font-semibold transition whitespace-nowrap">このサイトの使い方</button>
             </div>
-            <div class="flex items-center space-x-4 flex-wrap">
+            <div class="flex items-center gap-2 sm:gap-4 flex-wrap w-full sm:w-auto justify-between sm:justify-end">
                 <!-- User Profile & Rank -->
-                <div class="flex items-center space-x-2 bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200">
-                    <span id="userRankBadge" class="text-xs font-bold px-2 py-0.5 rounded text-white bg-slate-500">見習い</span>
-                    <input type="text" id="usernameInput" value="学習者" class="bg-transparent font-semibold text-sm focus:outline-none w-24 text-slate-700" onchange="updateUsername(this.value)" title="クリックしてユーザー名変更">
-                    <span class="text-xs text-slate-500">合計スコア: <strong id="totalScoreDisplay">0</strong></span>
-                    <span class="text-xs text-slate-600 flex items-center space-x-0.5 pl-1.5 border-l border-slate-300" title="連続ログイン日数">
+                <div class="flex items-center space-x-1.5 sm:space-x-2 bg-slate-100 px-2.5 sm:px-3 py-1.5 rounded-full border border-slate-200 max-w-full overflow-x-auto">
+                    <span id="userRankBadge" class="text-[11px] sm:text-xs font-bold px-2 py-0.5 rounded text-white bg-slate-500 whitespace-nowrap">見習い</span>
+                    <input type="text" id="usernameInput" value="学習者" class="bg-transparent font-semibold text-xs sm:text-sm focus:outline-none w-16 sm:w-24 text-slate-700" onchange="updateUsername(this.value)" title="クリックしてユーザー名変更">
+                    <span class="text-[11px] sm:text-xs text-slate-500 whitespace-nowrap">合計: <strong id="totalScoreDisplay">0</strong></span>
+                    <span class="text-[11px] sm:text-xs text-slate-600 flex items-center space-x-0.5 pl-1.5 border-l border-slate-300 whitespace-nowrap" title="連続ログイン日数">
                         <span class="animate-burn">🔥</span>
                         <strong id="loginStreakDisplay">1</strong>日
                     </span>
                 </div>
-                <!-- Account Login/Logout Controls (Home Screen Only) -->
-                <div id="homeAuthControls" class="flex items-center space-x-1.5">
-                    <div id="authStatusBadge" class="hidden inline-flex items-center space-x-2 text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-lg font-medium max-w-[270px]">
-                        <img id="authAvatarImg" src="" alt="ユーザーアイコン" referrerpolicy="no-referrer" class="hidden w-6 h-6 rounded-full object-cover border border-emerald-300 flex-shrink-0" onerror="this.classList.add('hidden'); document.getElementById('authAvatarFallback').classList.remove('hidden');">
-                        <span id="authAvatarFallback" class="hidden w-6 h-6 rounded-full bg-emerald-600 text-white text-[11px] font-bold flex items-center justify-center flex-shrink-0">U</span>
+                <!-- Account Login/Logout & Reset Controls (Home Screen Only) -->
+                <div id="homeAuthControls" class="flex items-center gap-1.5 flex-wrap">
+                    <div id="authStatusBadge" class="hidden inline-flex items-center space-x-1.5 sm:space-x-2 text-[11px] sm:text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 sm:px-2.5 py-1 rounded-lg font-medium max-w-[180px] sm:max-w-[270px]">
+                        <img id="authAvatarImg" src="" alt="ユーザーアイコン" referrerpolicy="no-referrer" class="hidden w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover border border-emerald-300 flex-shrink-0" onerror="this.classList.add('hidden'); document.getElementById('authAvatarFallback').classList.remove('hidden');">
+                        <span id="authAvatarFallback" class="hidden w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-emerald-600 text-white text-[10px] sm:text-[11px] font-bold flex items-center justify-center flex-shrink-0">U</span>
                         <span id="authStatusText" class="truncate"></span>
                     </div>
-                    <button id="openAuthModalBtn" onclick="openAuthModal()" class="text-xs bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded-lg font-medium shadow-sm transition">ログイン / 登録</button>
-                    <button id="logoutBtn" onclick="handleLogout()" class="hidden text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 px-2.5 py-1.5 rounded-lg font-medium transition">ログアウト</button>
+                    <button id="openAuthModalBtn" onclick="openAuthModal()" class="text-[11px] sm:text-xs bg-slate-800 hover:bg-slate-900 text-white px-2.5 sm:px-3 py-1.5 rounded-lg font-medium shadow-sm transition whitespace-nowrap">ログイン / 登録</button>
+                    <button id="resetAccountDataBtn" onclick="startTripleResetConfirm()" class="hidden text-[11px] sm:text-xs bg-rose-600 hover:bg-rose-700 text-white px-2.5 py-1.5 rounded-lg font-medium shadow-sm transition whitespace-nowrap">データリセット</button>
+                    <button id="logoutBtn" onclick="handleLogout()" class="hidden text-[11px] sm:text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 px-2.5 py-1.5 rounded-lg font-medium transition whitespace-nowrap">ログアウト</button>
                 </div>
                 <!-- Data Save/Load/Export/Import (Home Screen Only) -->
-                <div id="homeDataControls" class="flex items-center space-x-1">
-                    <button onclick="exportData()" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-2.5 py-1.5 rounded font-medium transition">エクスポート</button>
-                    <label class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-2.5 py-1.5 rounded font-medium transition cursor-pointer">
+                <div id="homeDataControls" class="flex items-center gap-1 flex-wrap">
+                    <button onclick="exportData()" class="text-[11px] sm:text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-2 sm:px-2.5 py-1.5 rounded font-medium transition">エクスポート</button>
+                    <label class="text-[11px] sm:text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-2 sm:px-2.5 py-1.5 rounded font-medium transition cursor-pointer">
                         インポート<input type="file" id="importFile" class="hidden" accept=".json" onchange="importData(event)">
                     </label>
-                    <button onclick="loadData(true)" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-2.5 py-1.5 rounded font-medium transition">ロード</button>
-                    <button onclick="saveData()" class="text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-2.5 py-1.5 rounded font-medium shadow-sm transition">セーブ</button>
+                    <button onclick="loadData(true)" class="text-[11px] sm:text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-2 sm:px-2.5 py-1.5 rounded font-medium transition">ロード</button>
+                    <button onclick="saveData()" class="text-[11px] sm:text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-2 sm:px-2.5 py-1.5 rounded font-medium shadow-sm transition">セーブ</button>
                 </div>
             </div>
         </div>
