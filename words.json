@@ -1,0 +1,1502 @@
+[
+  {
+    "id": 1,
+    "eng": "achieve",
+    "jap": "達成する"
+  },
+  {
+    "id": 2,
+    "eng": "tend",
+    "jap": "傾向がある"
+  },
+  {
+    "id": 3,
+    "eng": "establish",
+    "jap": "確立する"
+  },
+  {
+    "id": 4,
+    "eng": "include",
+    "jap": "含む"
+  },
+  {
+    "id": 5,
+    "eng": "improve",
+    "jap": "改善する"
+  },
+  {
+    "id": 6,
+    "eng": "create",
+    "jap": "創造する"
+  },
+  {
+    "id": 7,
+    "eng": "consider",
+    "jap": "考慮する"
+  },
+  {
+    "id": 8,
+    "eng": "appear",
+    "jap": "現れる"
+  },
+  {
+    "id": 9,
+    "eng": "exist",
+    "jap": "存在する"
+  },
+  {
+    "id": 10,
+    "eng": "maintain",
+    "jap": "維持する"
+  },
+  {
+    "id": 11,
+    "eng": "depend",
+    "jap": "依存する"
+  },
+  {
+    "id": 12,
+    "eng": "differ",
+    "jap": "異なる"
+  },
+  {
+    "id": 13,
+    "eng": "require",
+    "jap": "必要とする"
+  },
+  {
+    "id": 14,
+    "eng": "support",
+    "jap": "支持する"
+  },
+  {
+    "id": 15,
+    "eng": "provide",
+    "jap": "提供する"
+  },
+  {
+    "id": 16,
+    "eng": "encourage",
+    "jap": "励ます"
+  },
+  {
+    "id": 17,
+    "eng": "develop",
+    "jap": "発達させる"
+  },
+  {
+    "id": 18,
+    "eng": "cause",
+    "jap": "引き起こす"
+  },
+  {
+    "id": 19,
+    "eng": "reduce",
+    "jap": "減らす"
+  },
+  {
+    "id": 20,
+    "eng": "adapt",
+    "jap": "適応する"
+  },
+  {
+    "id": 21,
+    "eng": "affect",
+    "jap": "影響する"
+  },
+  {
+    "id": 22,
+    "eng": "concern",
+    "jap": "心配させる"
+  },
+  {
+    "id": 23,
+    "eng": "involve",
+    "jap": "巻き込む"
+  },
+  {
+    "id": 24,
+    "eng": "produce",
+    "jap": "生産する"
+  },
+  {
+    "id": 25,
+    "eng": "tendency",
+    "jap": "傾向"
+  },
+  {
+    "id": 26,
+    "eng": "influence",
+    "jap": "影響"
+  },
+  {
+    "id": 27,
+    "eng": "consequence",
+    "jap": "結果"
+  },
+  {
+    "id": 28,
+    "eng": "aspect",
+    "jap": "側面"
+  },
+  {
+    "id": 29,
+    "eng": "factor",
+    "jap": "要素"
+  },
+  {
+    "id": 30,
+    "eng": "role",
+    "jap": "役割"
+  },
+  {
+    "id": 31,
+    "eng": "generation",
+    "jap": "世代"
+  },
+  {
+    "id": 32,
+    "eng": "region",
+    "jap": "地域"
+  },
+  {
+    "id": 33,
+    "eng": "resource",
+    "jap": "資源"
+  },
+  {
+    "id": 34,
+    "eng": "source",
+    "jap": "源"
+  },
+  {
+    "id": 35,
+    "eng": "habit",
+    "jap": "習慣"
+  },
+  {
+    "id": 36,
+    "eng": "custom",
+    "jap": "慣習"
+  },
+  {
+    "id": 37,
+    "eng": "society",
+    "jap": "社会"
+  },
+  {
+    "id": 38,
+    "eng": "community",
+    "jap": "共同体"
+  },
+  {
+    "id": 39,
+    "eng": "population",
+    "jap": "人口"
+  },
+  {
+    "id": 40,
+    "eng": "individual",
+    "jap": "個人"
+  },
+  {
+    "id": 41,
+    "eng": "public",
+    "jap": "公衆の"
+  },
+  {
+    "id": 42,
+    "eng": "private",
+    "jap": "個人の"
+  },
+  {
+    "id": 43,
+    "eng": "global",
+    "jap": "地球規模の"
+  },
+  {
+    "id": 44,
+    "eng": "local",
+    "jap": "地元の"
+  },
+  {
+    "id": 45,
+    "eng": "native",
+    "jap": "母国の"
+  },
+  {
+    "id": 46,
+    "eng": "foreign",
+    "jap": "外国の"
+  },
+  {
+    "id": 47,
+    "eng": "domestic",
+    "jap": "国内の"
+  },
+  {
+    "id": 48,
+    "eng": "traditional",
+    "jap": "伝統的な"
+  },
+  {
+    "id": 49,
+    "eng": "modern",
+    "jap": "現代の"
+  },
+  {
+    "id": 50,
+    "eng": "ancient",
+    "jap": "古代の"
+  },
+  {
+    "id": 51,
+    "eng": "current",
+    "jap": "現在の"
+  },
+  {
+    "id": 52,
+    "eng": "recent",
+    "jap": "最近の"
+  },
+  {
+    "id": 53,
+    "eng": "future",
+    "jap": "将来の"
+  },
+  {
+    "id": 54,
+    "eng": "past",
+    "jap": "過去の"
+  },
+  {
+    "id": 55,
+    "eng": "century",
+    "jap": "世紀"
+  },
+  {
+    "id": 56,
+    "eng": "decade",
+    "jap": "10年"
+  },
+  {
+    "id": 57,
+    "eng": "era",
+    "jap": "時代"
+  },
+  {
+    "id": 58,
+    "eng": "period",
+    "jap": "期間"
+  },
+  {
+    "id": 59,
+    "eng": "moment",
+    "jap": "瞬間"
+  },
+  {
+    "id": 60,
+    "eng": "annual",
+    "jap": "年1回の"
+  },
+  {
+    "id": 61,
+    "eng": "frequent",
+    "jap": "頻繁な"
+  },
+  {
+    "id": 62,
+    "eng": "constant",
+    "jap": "絶え間ない"
+  },
+  {
+    "id": 63,
+    "eng": "gradual",
+    "jap": "徐々の"
+  },
+  {
+    "id": 64,
+    "eng": "sudden",
+    "jap": "突然の"
+  },
+  {
+    "id": 65,
+    "eng": "rapid",
+    "jap": "急速な"
+  },
+  {
+    "id": 66,
+    "eng": "slow",
+    "jap": "遅い"
+  },
+  {
+    "id": 67,
+    "eng": "quick",
+    "jap": "速い"
+  },
+  {
+    "id": 68,
+    "eng": "prompt",
+    "jap": "敏速な"
+  },
+  {
+    "id": 69,
+    "eng": "temporary",
+    "jap": "一時的な"
+  },
+  {
+    "id": 70,
+    "eng": "permanent",
+    "jap": "永続的な"
+  },
+  {
+    "id": 71,
+    "eng": "primary",
+    "jap": "第一の"
+  },
+  {
+    "id": 72,
+    "eng": "secondary",
+    "jap": "第二の"
+  },
+  {
+    "id": 73,
+    "eng": "major",
+    "jap": "主要な"
+  },
+  {
+    "id": 74,
+    "eng": "minor",
+    "jap": "重要でない"
+  },
+  {
+    "id": 75,
+    "eng": "prime",
+    "jap": "最も重要な"
+  },
+  {
+    "id": 76,
+    "eng": "chief",
+    "jap": "最高責任者"
+  },
+  {
+    "id": 77,
+    "eng": "principle",
+    "jap": "原則"
+  },
+  {
+    "id": 78,
+    "eng": "standard",
+    "jap": "基準"
+  },
+  {
+    "id": 79,
+    "eng": "criterion",
+    "jap": "尺度"
+  },
+  {
+    "id": 80,
+    "eng": "rule",
+    "jap": "規則"
+  },
+  {
+    "id": 81,
+    "eng": "regulation",
+    "jap": "規制"
+  },
+  {
+    "id": 82,
+    "eng": "law",
+    "jap": "法律"
+  },
+  {
+    "id": 83,
+    "eng": "justice",
+    "jap": "正義"
+  },
+  {
+    "id": 84,
+    "eng": "crime",
+    "jap": "犯罪"
+  },
+  {
+    "id": 85,
+    "eng": "guilt",
+    "jap": "有罪"
+  },
+  {
+    "id": 86,
+    "eng": "innocence",
+    "jap": "無罪"
+  },
+  {
+    "id": 87,
+    "eng": "prison",
+    "jap": "刑務所"
+  },
+  {
+    "id": 88,
+    "eng": "punishment",
+    "jap": "罰"
+  },
+  {
+    "id": 89,
+    "eng": "penalty",
+    "jap": "刑罰"
+  },
+  {
+    "id": 90,
+    "eng": "judge",
+    "jap": "裁判官"
+  },
+  {
+    "id": 91,
+    "eng": "jury",
+    "jap": "陪審"
+  },
+  {
+    "id": 92,
+    "eng": "witness",
+    "jap": "証人"
+  },
+  {
+    "id": 93,
+    "eng": "evidence",
+    "jap": "証拠"
+  },
+  {
+    "id": 94,
+    "eng": "proof",
+    "jap": "証拠"
+  },
+  {
+    "id": 95,
+    "eng": "clue",
+    "jap": "手がかり"
+  },
+  {
+    "id": 96,
+    "eng": "theory",
+    "jap": "理論"
+  },
+  {
+    "id": 97,
+    "eng": "hypothesis",
+    "jap": "仮説"
+  },
+  {
+    "id": 98,
+    "eng": "concept",
+    "jap": "概念"
+  },
+  {
+    "id": 99,
+    "eng": "notion",
+    "jap": "観念"
+  },
+  {
+    "id": 100,
+    "eng": "idea",
+    "jap": "考え"
+  },
+  {
+    "id": 101,
+    "eng": "ability",
+    "jap": "能力"
+  },
+  {
+    "id": 102,
+    "eng": "capacity",
+    "jap": "収容能力"
+  },
+  {
+    "id": 103,
+    "eng": "capability",
+    "jap": "潜在能力"
+  },
+  {
+    "id": 104,
+    "eng": "talent",
+    "jap": "才能"
+  },
+  {
+    "id": 105,
+    "eng": "skill",
+    "jap": "技能"
+  },
+  {
+    "id": 106,
+    "eng": "technique",
+    "jap": "技術"
+  },
+  {
+    "id": 107,
+    "eng": "technology",
+    "jap": "科学技術"
+  },
+  {
+    "id": 108,
+    "eng": "method",
+    "jap": "方法"
+  },
+  {
+    "id": 109,
+    "eng": "approach",
+    "jap": "アプローチ"
+  },
+  {
+    "id": 110,
+    "eng": "strategy",
+    "jap": "戦略"
+  },
+  {
+    "id": 111,
+    "eng": "tactic",
+    "jap": "戦術"
+  },
+  {
+    "id": 112,
+    "eng": "plan",
+    "jap": "計画"
+  },
+  {
+    "id": 113,
+    "eng": "project",
+    "jap": "計画"
+  },
+  {
+    "id": 114,
+    "eng": "scheme",
+    "jap": "計画"
+  },
+  {
+    "id": 115,
+    "eng": "program",
+    "jap": "計画"
+  },
+  {
+    "id": 116,
+    "eng": "schedule",
+    "jap": "予定表"
+  },
+  {
+    "id": 117,
+    "eng": "agenda",
+    "jap": "協議事項"
+  },
+  {
+    "id": 118,
+    "eng": "goal",
+    "jap": "目標"
+  },
+  {
+    "id": 119,
+    "eng": "target",
+    "jap": "的"
+  },
+  {
+    "id": 120,
+    "eng": "aim",
+    "jap": "狙い"
+  },
+  {
+    "id": 121,
+    "eng": "purpose",
+    "jap": "目的"
+  },
+  {
+    "id": 122,
+    "eng": "object",
+    "jap": "物体"
+  },
+  {
+    "id": 123,
+    "eng": "intent",
+    "jap": "意図"
+  },
+  {
+    "id": 124,
+    "eng": "outcome",
+    "jap": "結果"
+  },
+  {
+    "id": 125,
+    "eng": "result",
+    "jap": "結果"
+  },
+  {
+    "id": 126,
+    "eng": "effect",
+    "jap": "効果"
+  },
+  {
+    "id": 127,
+    "eng": "impact",
+    "jap": "衝撃"
+  },
+  {
+    "id": 128,
+    "eng": "affect",
+    "jap": "影響する"
+  },
+  {
+    "id": 129,
+    "eng": "influence",
+    "jap": "影響する"
+  },
+  {
+    "id": 130,
+    "eng": "cause",
+    "jap": "引き起こす"
+  },
+  {
+    "id": 131,
+    "eng": "reason",
+    "jap": "理由"
+  },
+  {
+    "id": 132,
+    "eng": "cause",
+    "jap": "原因"
+  },
+  {
+    "id": 133,
+    "eng": "origin",
+    "jap": "起源"
+  },
+  {
+    "id": 134,
+    "eng": "root",
+    "jap": "根"
+  },
+  {
+    "id": 135,
+    "eng": "basis",
+    "jap": "基礎"
+  },
+  {
+    "id": 136,
+    "eng": "foundation",
+    "jap": "土台"
+  },
+  {
+    "id": 137,
+    "eng": "ground",
+    "jap": "地面"
+  },
+  {
+    "id": 138,
+    "eng": "land",
+    "jap": "土地"
+  },
+  {
+    "id": 139,
+    "eng": "earth",
+    "jap": "地球"
+  },
+  {
+    "id": 140,
+    "eng": "soil",
+    "jap": "土壌"
+  },
+  {
+    "id": 141,
+    "eng": "dust",
+    "jap": "ほこり"
+  },
+  {
+    "id": 142,
+    "eng": "mud",
+    "jap": "泥"
+  },
+  {
+    "id": 143,
+    "eng": "rock",
+    "jap": "岩"
+  },
+  {
+    "id": 144,
+    "eng": "stone",
+    "jap": "石"
+  },
+  {
+    "id": 145,
+    "eng": "mountain",
+    "jap": "山"
+  },
+  {
+    "id": 146,
+    "eng": "hill",
+    "jap": "丘"
+  },
+  {
+    "id": 147,
+    "eng": "valley",
+    "jap": "谷"
+  },
+  {
+    "id": 148,
+    "eng": "river",
+    "jap": "川"
+  },
+  {
+    "id": 149,
+    "eng": "stream",
+    "jap": "小川"
+  },
+  {
+    "id": 150,
+    "eng": "lake",
+    "jap": "湖"
+  },
+  {
+    "id": 151,
+    "eng": "ocean",
+    "jap": "海洋"
+  },
+  {
+    "id": 152,
+    "eng": "sea",
+    "jap": "海"
+  },
+  {
+    "id": 153,
+    "eng": "wave",
+    "jap": "波"
+  },
+  {
+    "id": 154,
+    "eng": "shore",
+    "jap": "岸"
+  },
+  {
+    "id": 155,
+    "eng": "coast",
+    "jap": "海岸"
+  },
+  {
+    "id": 156,
+    "eng": "beach",
+    "jap": "浜辺"
+  },
+  {
+    "id": 157,
+    "eng": "island",
+    "jap": "島"
+  },
+  {
+    "id": 158,
+    "eng": "forest",
+    "jap": "森林"
+  },
+  {
+    "id": 159,
+    "eng": "woods",
+    "jap": "森"
+  },
+  {
+    "id": 160,
+    "eng": "jungle",
+    "jap": "ジャングル"
+  },
+  {
+    "id": 161,
+    "eng": "desert",
+    "jap": "砂漠"
+  },
+  {
+    "id": 162,
+    "eng": "field",
+    "jap": "原野"
+  },
+  {
+    "id": 163,
+    "eng": "plain",
+    "jap": "平原"
+  },
+  {
+    "id": 164,
+    "eng": "grass",
+    "jap": "草"
+  },
+  {
+    "id": 165,
+    "eng": "plant",
+    "jap": "植物"
+  },
+  {
+    "id": 166,
+    "eng": "flower",
+    "jap": "花"
+  },
+  {
+    "id": 167,
+    "eng": "tree",
+    "jap": "木"
+  },
+  {
+    "id": 168,
+    "eng": "branch",
+    "jap": "枝"
+  },
+  {
+    "id": 169,
+    "eng": "leaf",
+    "jap": "葉"
+  },
+  {
+    "id": 170,
+    "eng": "root",
+    "jap": "根"
+  },
+  {
+    "id": 171,
+    "eng": "fruit",
+    "jap": "果実"
+  },
+  {
+    "id": 172,
+    "eng": "seed",
+    "jap": "種"
+  },
+  {
+    "id": 173,
+    "eng": "crop",
+    "jap": "作物"
+  },
+  {
+    "id": 174,
+    "eng": "harvest",
+    "jap": "収穫"
+  },
+  {
+    "id": 175,
+    "eng": "animal",
+    "jap": "動物"
+  },
+  {
+    "id": 176,
+    "eng": "creature",
+    "jap": "生き物"
+  },
+  {
+    "id": 177,
+    "eng": "beast",
+    "jap": "野獣"
+  },
+  {
+    "id": 178,
+    "eng": "wildlife",
+    "jap": "野生生物"
+  },
+  {
+    "id": 179,
+    "eng": "insect",
+    "jap": "昆虫"
+  },
+  {
+    "id": 180,
+    "eng": "bird",
+    "jap": "鳥"
+  },
+  {
+    "id": 181,
+    "eng": "fish",
+    "jap": "魚"
+  },
+  {
+    "id": 182,
+    "eng": "species",
+    "jap": "種"
+  },
+  {
+    "id": 183,
+    "eng": "breed",
+    "jap": "品種"
+  },
+  {
+    "id": 184,
+    "eng": "pet",
+    "jap": "ペット"
+  },
+  {
+    "id": 185,
+    "eng": "owner",
+    "jap": "飼い主"
+  },
+  {
+    "id": 186,
+    "eng": "master",
+    "jap": "主人"
+  },
+  {
+    "id": 187,
+    "eng": "servant",
+    "jap": "召使い"
+  },
+  {
+    "id": 188,
+    "eng": "slave",
+    "jap": "奴隷"
+  },
+  {
+    "id": 189,
+    "eng": "host",
+    "jap": "主人"
+  },
+  {
+    "id": 190,
+    "eng": "guest",
+    "jap": "客"
+  },
+  {
+    "id": 191,
+    "eng": "visitor",
+    "jap": "訪問者"
+  },
+  {
+    "id": 192,
+    "eng": "stranger",
+    "jap": "見知らぬ人"
+  },
+  {
+    "id": 193,
+    "eng": "neighbor",
+    "jap": "近所の人"
+  },
+  {
+    "id": 194,
+    "eng": "member",
+    "jap": "一員"
+  },
+  {
+    "id": 195,
+    "eng": "partner",
+    "jap": "仲間"
+  },
+  {
+    "id": 196,
+    "eng": "colleague",
+    "jap": "同僚"
+  },
+  {
+    "id": 197,
+    "eng": "companion",
+    "jap": "連れ"
+  },
+  {
+    "id": 198,
+    "eng": "associate",
+    "jap": "仲間"
+  },
+  {
+    "id": 199,
+    "eng": "ally",
+    "jap": "同盟国"
+  },
+  {
+    "id": 200,
+    "eng": "enemy",
+    "jap": "敵"
+  },
+  {
+    "id": 201,
+    "eng": "danger",
+    "jap": "危険"
+  },
+  {
+    "id": 202,
+    "eng": "risk",
+    "jap": "リスク"
+  },
+  {
+    "id": 203,
+    "eng": "hazard",
+    "jap": "危険要素"
+  },
+  {
+    "id": 204,
+    "eng": "threat",
+    "jap": "脅威"
+  },
+  {
+    "id": 205,
+    "eng": "crisis",
+    "jap": "危機"
+  },
+  {
+    "id": 206,
+    "eng": "emergency",
+    "jap": "緊急事態"
+  },
+  {
+    "id": 207,
+    "eng": "disaster",
+    "jap": "災害"
+  },
+  {
+    "id": 208,
+    "eng": "tragedy",
+    "jap": "悲劇"
+  },
+  {
+    "id": 209,
+    "eng": "accident",
+    "jap": "事故"
+  },
+  {
+    "id": 210,
+    "eng": "incident",
+    "jap": "出来事"
+  },
+  {
+    "id": 211,
+    "eng": "event",
+    "jap": "行事"
+  },
+  {
+    "id": 212,
+    "eng": "occasion",
+    "jap": "機会"
+  },
+  {
+    "id": 213,
+    "eng": "opportunity",
+    "jap": "好機"
+  },
+  {
+    "id": 214,
+    "eng": "chance",
+    "jap": "可能性"
+  },
+  {
+    "id": 215,
+    "eng": "luck",
+    "jap": "運"
+  },
+  {
+    "id": 216,
+    "eng": "fortune",
+    "jap": "幸運"
+  },
+  {
+    "id": 217,
+    "eng": "fate",
+    "jap": "運命"
+  },
+  {
+    "id": 218,
+    "eng": "destiny",
+    "jap": "運命"
+  },
+  {
+    "id": 219,
+    "eng": "doom",
+    "jap": "破滅"
+  },
+  {
+    "id": 220,
+    "eng": "success",
+    "jap": "成功"
+  },
+  {
+    "id": 221,
+    "eng": "failure",
+    "jap": "失敗"
+  },
+  {
+    "id": 222,
+    "eng": "victory",
+    "jap": "勝利"
+  },
+  {
+    "id": 223,
+    "eng": "defeat",
+    "jap": "敗北"
+  },
+  {
+    "id": 224,
+    "eng": "triumph",
+    "jap": "大勝利"
+  },
+  {
+    "id": 225,
+    "eng": "prize",
+    "jap": "賞"
+  },
+  {
+    "id": 226,
+    "eng": "award",
+    "jap": "賞"
+  },
+  {
+    "id": 227,
+    "eng": "reward",
+    "jap": "報酬"
+  },
+  {
+    "id": 228,
+    "eng": "bonus",
+    "jap": "ボーナス"
+  },
+  {
+    "id": 229,
+    "eng": "benefit",
+    "jap": "利益"
+  },
+  {
+    "id": 230,
+    "eng": "profit",
+    "jap": "利益"
+  },
+  {
+    "id": 231,
+    "eng": "loss",
+    "jap": "損失"
+  },
+  {
+    "id": 232,
+    "eng": "damage",
+    "jap": "損害"
+  },
+  {
+    "id": 233,
+    "eng": "harm",
+    "jap": "害"
+  },
+  {
+    "id": 234,
+    "eng": "injury",
+    "jap": "負傷"
+  },
+  {
+    "id": 235,
+    "eng": "wound",
+    "jap": "傷"
+  },
+  {
+    "id": 236,
+    "eng": "pain",
+    "jap": "痛み"
+  },
+  {
+    "id": 237,
+    "eng": "ache",
+    "jap": "うずき"
+  },
+  {
+    "id": 238,
+    "eng": "suffer",
+    "jap": "苦しむ"
+  },
+  {
+    "id": 239,
+    "eng": "cure",
+    "jap": "治療する"
+  },
+  {
+    "id": 240,
+    "eng": "heal",
+    "jap": "直す"
+  },
+  {
+    "id": 241,
+    "eng": "treatment",
+    "jap": "治療"
+  },
+  {
+    "id": 242,
+    "eng": "medicine",
+    "jap": "薬"
+  },
+  {
+    "id": 243,
+    "eng": "drug",
+    "jap": "麻薬"
+  },
+  {
+    "id": 244,
+    "eng": "pill",
+    "jap": "錠剤"
+  },
+  {
+    "id": 245,
+    "eng": "remedy",
+    "jap": "治療薬"
+  },
+  {
+    "id": 246,
+    "eng": "health",
+    "jap": "健康"
+  },
+  {
+    "id": 247,
+    "eng": "fitness",
+    "jap": "健康"
+  },
+  {
+    "id": 248,
+    "eng": "strength",
+    "jap": "体力"
+  },
+  {
+    "id": 249,
+    "eng": "energy",
+    "jap": "エネルギー"
+  },
+  {
+    "id": 250,
+    "eng": "vigor",
+    "jap": "活力"
+  },
+  {
+    "id": 251,
+    "eng": "power",
+    "jap": "力"
+  },
+  {
+    "id": 252,
+    "eng": "force",
+    "jap": "暴力"
+  },
+  {
+    "id": 253,
+    "eng": "might",
+    "jap": "力"
+  },
+  {
+    "id": 254,
+    "eng": "strength",
+    "jap": "強さ"
+  },
+  {
+    "id": 255,
+    "eng": "weakness",
+    "jap": "弱さ"
+  },
+  {
+    "id": 256,
+    "eng": "fragility",
+    "jap": "脆さ"
+  },
+  {
+    "id": 257,
+    "eng": "stiff",
+    "jap": "硬い"
+  },
+  {
+    "id": 258,
+    "eng": "flexible",
+    "jap": "柔軟な"
+  },
+  {
+    "id": 259,
+    "eng": "rigid",
+    "jap": "厳格な"
+  },
+  {
+    "id": 260,
+    "eng": "hard",
+    "jap": "硬い"
+  },
+  {
+    "id": 261,
+    "eng": "soft",
+    "jap": "柔らかい"
+  },
+  {
+    "id": 262,
+    "eng": "smooth",
+    "jap": "なめらかな"
+  },
+  {
+    "id": 263,
+    "eng": "rough",
+    "jap": "粗い"
+  },
+  {
+    "id": 264,
+    "eng": "sharp",
+    "jap": "鋭い"
+  },
+  {
+    "id": 265,
+    "eng": "blunt",
+    "jap": "鈍い"
+  },
+  {
+    "id": 266,
+    "eng": "clear",
+    "jap": "明確な"
+  },
+  {
+    "id": 267,
+    "eng": "obscure",
+    "jap": "不明瞭な"
+  },
+  {
+    "id": 268,
+    "eng": "vague",
+    "jap": "曖昧な"
+  },
+  {
+    "id": 269,
+    "eng": "definite",
+    "jap": "明確な"
+  },
+  {
+    "id": 270,
+    "eng": "certain",
+    "jap": "確実な"
+  },
+  {
+    "id": 271,
+    "eng": "sure",
+    "jap": "確信して"
+  },
+  {
+    "id": 272,
+    "eng": "doubt",
+    "jap": "疑い"
+  },
+  {
+    "id": 273,
+    "eng": "suspicion",
+    "jap": "嫌疑"
+  },
+  {
+    "id": 274,
+    "eng": "trust",
+    "jap": "信頼"
+  },
+  {
+    "id": 275,
+    "eng": "faith",
+    "jap": "信仰"
+  },
+  {
+    "id": 276,
+    "eng": "belief",
+    "jap": "信念"
+  },
+  {
+    "id": 277,
+    "eng": "opinion",
+    "jap": "意見"
+  },
+  {
+    "id": 278,
+    "eng": "view",
+    "jap": "見解"
+  },
+  {
+    "id": 279,
+    "eng": "idea",
+    "jap": "考え"
+  },
+  {
+    "id": 280,
+    "eng": "thought",
+    "jap": "思考"
+  },
+  {
+    "id": 281,
+    "eng": "mind",
+    "jap": "精神"
+  },
+  {
+    "id": 282,
+    "eng": "brain",
+    "jap": "脳"
+  },
+  {
+    "id": 283,
+    "eng": "intellect",
+    "jap": "知性"
+  },
+  {
+    "id": 284,
+    "eng": "intelligence",
+    "jap": "知能"
+  },
+  {
+    "id": 285,
+    "eng": "wisdom",
+    "jap": "知恵"
+  },
+  {
+    "id": 286,
+    "eng": "knowledge",
+    "jap": "知識"
+  },
+  {
+    "id": 287,
+    "eng": "sense",
+    "jap": "感覚"
+  },
+  {
+    "id": 288,
+    "eng": "feeling",
+    "jap": "感情"
+  },
+  {
+    "id": 289,
+    "eng": "emotion",
+    "jap": "感情"
+  },
+  {
+    "id": 290,
+    "eng": "passion",
+    "jap": "情熱"
+  },
+  {
+    "id": 291,
+    "eng": "desire",
+    "jap": "欲望"
+  },
+  {
+    "id": 292,
+    "eng": "wish",
+    "jap": "願い"
+  },
+  {
+    "id": 293,
+    "eng": "hope",
+    "jap": "希望"
+  },
+  {
+    "id": 294,
+    "eng": "dream",
+    "jap": "夢"
+  },
+  {
+    "id": 295,
+    "eng": "ambition",
+    "jap": "大志"
+  },
+  {
+    "id": 296,
+    "eng": "goal",
+    "jap": "目標"
+  },
+  {
+    "id": 297,
+    "eng": "aim",
+    "jap": "狙い"
+  },
+  {
+    "id": 298,
+    "eng": "target",
+    "jap": "的"
+  },
+  {
+    "id": 299,
+    "eng": "plan",
+    "jap": "計画"
+  },
+  {
+    "id": 300,
+    "eng": "project",
+    "jap": "計画"
+  }
+]
